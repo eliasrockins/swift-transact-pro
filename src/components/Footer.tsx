@@ -1,12 +1,12 @@
+import logo from "@/assets/logo.png";
+
 const Footer = () => {
   return (
     <footer className="py-12 border-t border-border">
       <div className="container mx-auto px-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center glow-border">
-              <span className="font-heading font-bold text-primary text-xs">CK</span>
-            </div>
+            <img src={logo} alt="CK Soluções" className="w-8 h-8" />
             <span className="font-heading font-bold text-foreground">CK Soluções</span>
           </div>
 
