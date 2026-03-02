@@ -8,6 +8,7 @@ import FAQSection from "@/components/FAQSection";
 import CTASection from "@/components/CTASection";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
+import WhatsAppPopup from "@/components/WhatsAppPopup";
 
 const Index = () => {
   return (
@@ -22,6 +23,7 @@ const Index = () => {
       <CTASection />
       <ContactSection />
       <Footer />
+      <WhatsAppPopup />
     </div>
   );
 };
