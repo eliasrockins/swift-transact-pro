@@ -2,41 +2,46 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import logo from "@/assets/logo.png";
 
 const navItems = [
-  { label: "Página Inicial", href: "#inicio" },
-  { label: "Sobre Nós", href: "#sobre" },
-  { label: "Soluções", href: "#solucoes" },
-  { label: "Depoimentos", href: "#depoimentos" },
-  { label: "FAQ", href: "#faq" },
-  { label: "Contato", href: "#contato" },
+  { label: "Página Inicial", href: "/" },
+  { label: "Sobre Nós", href: "/sobre-nos" },
+  { label: "Soluções", href: "/solucoes" },
+  { label: "Depoimentos", href: "/depoimentos" },
+  { label: "FAQ", href: "/faq" },
+  { label: "Contato", href: "/contato" },
 ];
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-border/50">
       <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-        <a href="#inicio" className="flex items-center gap-2">
+        <Link to="/" className="flex items-center gap-2">
           <img src={logo} alt="CK Soluções" className="w-10 h-10" />
           <span className="font-heading font-bold text-xl text-foreground">
             CK Soluções
           </span>
-        </a>
+        </Link>
 
         {/* Desktop Nav */}
         <div className="hidden lg:flex items-center gap-8">
           {navItems.map((item) => (
-            <a
+            <Link
               key={item.label}
-              href={item.href}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              to={item.href}
+              className={`text-sm transition-colors ${
+                location.pathname === item.href
+                  ? "text-primary font-medium"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
             >
               {item.label}
-            </a>
+            </Link>
           ))}
         </div>
 
@@ -69,14 +74,18 @@ const Navbar = () => {
           >
             <div className="container mx-auto px-6 py-4 flex flex-col gap-4">
               {navItems.map((item) => (
-                <a
+                <Link
                   key={item.label}
-                  href={item.href}
+                  to={item.href}
                   onClick={() => setIsOpen(false)}
-                  className="text-muted-foreground hover:text-foreground transition-colors py-2"
+                  className={`transition-colors py-2 ${
+                    location.pathname === item.href
+                      ? "text-primary font-medium"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
                 >
                   {item.label}
-                </a>
+                </Link>
               ))}
               <Link to="/auth" onClick={() => setIsOpen(false)}>
                 <Button variant="ghost" size="sm" className="justify-start gap-2 text-muted-foreground">
