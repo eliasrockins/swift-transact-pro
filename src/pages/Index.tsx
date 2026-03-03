@@ -5,6 +5,7 @@ import StatsSection from "@/components/StatsSection";
 import VideoShowcase from "@/components/VideoShowcase";
 import SatisfactionSection from "@/components/SatisfactionSection";
 import CTASection from "@/components/CTASection";
+import HomeFAQSection from "@/components/HomeFAQSection";
 import Footer from "@/components/Footer";
 import WhatsAppPopup from "@/components/WhatsAppPopup";
 
@@ -17,6 +18,7 @@ const Index = () => {
       <StatsSection />
       <VideoShowcase videoSrc="/videos/cta-video.mov" />
       <SatisfactionSection />
+      <HomeFAQSection />
       <VideoShowcase videoSrc="/videos/asas-video.mov" />
       <VideoShowcase videoSrc="/videos/ck-solucoes-2.mp4" />
       <CTASection />
