@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
+import HomeVideoTestimonials from "@/components/HomeVideoTestimonials";
 import FeaturesSection from "@/components/FeaturesSection";
 import StatsSection from "@/components/StatsSection";
 import VideoShowcase from "@/components/VideoShowcase";
@@ -15,6 +16,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <HeroSection />
+      <HomeVideoTestimonials />
       <FeaturesSection />
       <StatsSection />
       <VideoShowcase videoSrc="/videos/cta-video.mov" />
