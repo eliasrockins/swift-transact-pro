@@ -16,12 +16,15 @@ const AboutSection = () => {
             className="relative"
           >
             <div className="relative rounded-2xl overflow-hidden glow-border">
-              <div className="aspect-[4/3] bg-gradient-to-br from-primary/20 via-card to-accent/10 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="text-7xl font-heading font-bold text-gradient mb-2">7+</div>
-                  <p className="text-muted-foreground text-lg">Anos de experiência</p>
-                </div>
-              </div>
+              <video
+                className="w-full aspect-[4/3] object-cover"
+                autoPlay
+                loop
+                muted
+                playsInline
+              >
+                <source src="/videos/about-video.mov" type="video/quicktime" />
+              </video>
             </div>
           </motion.div>
 
