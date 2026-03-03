@@ -2,6 +2,7 @@ import Navbar from "@/components/Navbar";
 import SolutionsShowcase from "@/components/SolutionsShowcase";
 import WhoWeAreSection from "@/components/WhoWeAreSection";
 import ServicesGrid from "@/components/ServicesGrid";
+import ClientsCarousel from "@/components/ClientsCarousel";
 import Footer from "@/components/Footer";
 import WhatsAppPopup from "@/components/WhatsAppPopup";
 
@@ -13,6 +14,7 @@ const Solucoes = () => {
         <SolutionsShowcase />
         <WhoWeAreSection />
         <ServicesGrid />
+        <ClientsCarousel />
       </div>
       <Footer />
       <WhatsAppPopup />
