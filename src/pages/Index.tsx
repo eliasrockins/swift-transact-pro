@@ -17,6 +17,7 @@ const Index = () => {
       <StatsSection />
       <VideoShowcase videoSrc="/videos/cta-video.mov" />
       <SatisfactionSection />
+      <VideoShowcase videoSrc="/videos/asas-video.mov" />
       <VideoShowcase videoSrc="/videos/ck-solucoes-2.mp4" />
       <CTASection />
       <Footer />
