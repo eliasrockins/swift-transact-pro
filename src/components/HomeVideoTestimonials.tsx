@@ -5,7 +5,7 @@ const videos = [
   { src: "/videos/depoimento-2.mp4", poster: "/images/depoimento-2-poster.png" },
   { src: "/videos/depoimento-3.mp4", poster: "/images/depoimento-3-poster.png" },
   { src: "/videos/depoimento-4.mp4", poster: "/images/depoimento-4-poster.png" },
-  { src: "/videos/depoimento-5.mp4" },
+  { src: "/videos/depoimento-5.mp4", poster: "/images/depoimento-5-poster.png" },
 ];
 
 const HomeVideoTestimonials = () => {
