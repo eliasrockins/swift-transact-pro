@@ -61,6 +61,26 @@ const ContactSection = () => {
             ))}
           </motion.div>
         </div>
+
+        {/* Video */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mt-16"
+        >
+          <div className="rounded-2xl overflow-hidden glow-border">
+            <video
+              className="w-full aspect-video object-cover"
+              autoPlay
+              loop
+              muted
+              playsInline
+            >
+              <source src="/videos/ck-solucoes.mp4" type="video/mp4" />
+            </video>
+          </div>
+        </motion.div>
       </div>
     </section>
   );
