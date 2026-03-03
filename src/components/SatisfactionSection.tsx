@@ -32,7 +32,7 @@ const SatisfactionSection = () => {
               {/* Years of experience */}
               <div className="flex flex-col justify-center">
                 <CheckCircle className="w-6 h-6 text-primary mb-2" />
-                <span className="text-5xl font-heading font-bold text-primary">7</span>
+                <span className="text-5xl font-heading font-bold text-primary">9</span>
                 <span className="text-foreground font-heading font-bold text-lg mt-1">
                   Anos de<br />experiência
                 </span>
