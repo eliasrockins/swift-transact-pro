@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
-import { ArrowRight, Shield } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import logo from "@/assets/logo.png";
 
 const HeroSection = () => {
   const navigate = useNavigate();
@@ -29,10 +30,10 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 glow-border mb-8"
+            className="flex items-center gap-3 mb-8"
           >
-            <Shield className="w-4 h-4 text-primary" />
-            <span className="text-sm text-primary font-medium">Plataforma 100% Segura</span>
+            <img src={logo} alt="CK Soluções" className="w-16 h-16" />
+            <span className="text-2xl font-heading font-bold text-primary">CK Soluções</span>
           </motion.div>
 
           <motion.h1
