@@ -2,12 +2,17 @@ import { useState } from 'react';
 import { RegisterForm } from "@/components/auth/RegisterForm";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { useAuth } from "@/contexts/AuthContext";
-import { Navigate } from "react-router-dom";
+import { Navigate, useSearchParams } from "react-router-dom";
 import logo from "@/assets/logo.png";
 
 const Auth = () => {
   const { session } = useAuth();
-  const [isLogin, setIsLogin] = useState(true);
+  
+  // NOVO: Essa linha "lê" o que está escrito na URL do navegador
+  const [searchParams] = useSearchParams(); 
+
+  // NOVO: Se a URL tiver "?aba=cadastro", o isLogin começa como false (abrindo a aba Criar Conta)
+  const [isLogin, setIsLogin] = useState(searchParams.get('aba') !== 'cadastro');
 
   // CORREÇÃO: Se já estiver logado, redireciona para o DASHBOARD e não para a Home
   if (session) return <Navigate to="/dashboard" replace />;

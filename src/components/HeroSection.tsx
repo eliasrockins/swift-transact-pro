@@ -65,7 +65,9 @@ const HeroSection = () => {
               Saiba Mais
               <ArrowRight className="w-5 h-5" />
             </Button>
-            <Button onClick={() => navigate("/auth")} size="lg" variant="outline" className="text-base px-8 py-6 border-border hover:bg-secondary">
+            
+            {/* O SEGREDO ESTÁ AQUI NA LINHA ABAIXO 👇 */}
+            <Button onClick={() => navigate("/auth?aba=cadastro")} size="lg" variant="outline" className="text-base px-8 py-6 border-border hover:bg-secondary">
               Criar Conta
             </Button>
           </motion.div>
