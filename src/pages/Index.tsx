@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import StatsSection from "@/components/StatsSection";
+import VideoShowcase from "@/components/VideoShowcase";
 import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
 import WhatsAppPopup from "@/components/WhatsAppPopup";
@@ -11,6 +12,7 @@ const Index = () => {
       <Navbar />
       <HeroSection />
       <StatsSection />
+      <VideoShowcase videoSrc="/videos/cta-video.mov" />
       <CTASection />
       <Footer />
       <WhatsAppPopup />
