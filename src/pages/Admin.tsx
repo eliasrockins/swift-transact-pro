@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { useAuth } from '../contexts/AuthContext'; // NOVO: Para fazer o logout
-import { useNavigate } from 'react-router-dom'; // NOVO: Para redirecionar após sair
+import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { 
   Users, ShoppingCart, Trash2, 
-  RefreshCcw, CreditCard, AlertCircle, Package, Plus, X, LogOut 
+  RefreshCcw, CreditCard, AlertCircle, Package, Plus, X, LogOut, Edit3 
 } from 'lucide-react';
 import { toast } from "sonner";
 import logo from "@/assets/logo.png";
@@ -24,10 +24,15 @@ export default function Admin() {
   const [valor, setValor] = useState('');
   const [pixCode, setPixCode] = useState('');
 
-  // ESTADOS DO NOVO MODAL DE PRODUTOS
+  // ESTADOS DO MODAL DE PRODUTOS
   const [isModalProdutoOpen, setIsModalProdutoOpen] = useState(false);
   const [novoProdutoNome, setNovoProdutoNome] = useState('');
   const [novoProdutoValor, setNovoProdutoValor] = useState('');
+
+  // ESTADOS DO MODAL DE EDITAR PIX
+  const [isModalPixOpen, setIsModalPixOpen] = useState(false);
+  const [vendaEditando, setVendaEditando] = useState<any>(null);
+  const [novoPix, setNovoPix] = useState('');
 
   useEffect(() => {
     carregarDados();
@@ -54,10 +59,19 @@ export default function Admin() {
     }
   }
 
-  // FUNÇÃO DE SAIR (LOGOUT)
   const handleLogout = async () => {
     await signOut();
     navigate('/auth');
+  };
+
+  const aprovarVenda = async (id: string) => {
+    const confirmar = window.confirm("Deseja realmente aprovar esta venda e marcar como paga?");
+    if (!confirmar) return;
+
+    const { error } = await supabase.from('vendas').update({ status: 'pago' }).eq('id', id);
+    if (error) return toast.error("Erro ao aprovar.");
+    toast.success("Venda aprovada com sucesso!");
+    carregarDados();
   };
 
   const excluirVenda = async (id: string) => {
@@ -86,7 +100,6 @@ export default function Admin() {
     carregarDados();
   };
 
-  // FUNÇÃO QUE CONECTA COM O SUPABASE PARA CRIAR O PRODUTO
   const cadastrarNovoProduto = async () => {
     if (!novoProdutoNome.trim()) return toast.error("O nome do produto é obrigatório.");
 
@@ -104,6 +117,30 @@ export default function Admin() {
     carregarDados(); 
   };
 
+  // FUNÇÕES DE EDIÇÃO DE PIX
+  const abrirModalPix = (venda: any) => {
+    setVendaEditando(venda);
+    setNovoPix(venda.pix_copia_cola || '');
+    setIsModalPixOpen(true);
+  };
+
+  const salvarNovoPix = async () => {
+    if (!novoPix.trim()) return toast.error("O código Pix não pode estar vazio.");
+
+    const { error } = await supabase
+      .from('vendas')
+      .update({ pix_copia_cola: novoPix })
+      .eq('id', vendaEditando.id);
+
+    if (error) return toast.error("Erro ao atualizar o Pix.");
+
+    toast.success("Código Pix atualizado com sucesso!");
+    setIsModalPixOpen(false);
+    setVendaEditando(null);
+    setNovoPix('');
+    carregarDados();
+  };
+
   if (loading) return <div className="flex h-screen items-center justify-center text-blue-600 font-bold">SINCRONIZANDO...</div>;
 
   const vendasPendentes = vendas.filter(v => v.status?.toLowerCase() === 'pendente');
@@ -111,7 +148,6 @@ export default function Admin() {
   return (
     <div className="min-h-screen bg-[#f8fafc] p-4 md:p-8 font-sans relative">
       
-      {/* HEADER COM O BOTÃO DE SAIR */}
       <header className="max-w-7xl mx-auto mb-10 flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
         <div className="flex items-center gap-4">
           <img src={logo} alt="Logo" className="h-12 w-auto object-contain" />
@@ -171,7 +207,6 @@ export default function Admin() {
           </div>
 
           <div className="mb-6">
-            {/* BOTÃO CRIAR PRODUTO ADICIONADO AQUI */}
             <div className="flex justify-between items-center mb-3 p-2 bg-gray-50 rounded-xl border border-gray-100">
               <label className="text-[10px] font-black text-gray-500 uppercase ml-2">Selecione o Produto</label>
               <button 
@@ -239,9 +274,28 @@ export default function Admin() {
                       <td className="px-8 py-6 font-bold text-gray-900 text-sm">{v.clientes?.nome} {v.clientes?.sobrenome}</td>
                       <td className="px-8 py-6 text-gray-900 text-xs font-bold italic">{v.produto}</td>
                       <td className="px-8 py-6 font-black text-green-600 text-lg">R$ {v.valor}</td>
-                      <td className="px-8 py-6 flex justify-center gap-3">
-                        <button className="bg-green-100 text-green-700 px-4 py-2 rounded-xl font-black text-[10px] uppercase hover:bg-green-600 hover:text-white transition-all">Aprovar</button>
-                        <button onClick={() => excluirVenda(v.id)} className="bg-red-50 text-red-500 p-2.5 rounded-xl hover:bg-red-500 hover:text-white transition-all">
+                      <td className="px-8 py-6 flex justify-center items-center gap-2">
+                        
+                        {/* NOVO BOTÃO DE EDITAR PIX AQUI */}
+                        <button 
+                          onClick={() => abrirModalPix(v)} 
+                          className="bg-blue-50 text-blue-600 px-4 py-2 rounded-xl font-black text-[10px] uppercase hover:bg-blue-100 transition-all flex items-center gap-1.5"
+                        >
+                          <Edit3 size={14} /> Pix
+                        </button>
+                        
+                        {/* BOTÃO APROVAR RELIGADO */}
+                        <button 
+                          onClick={() => aprovarVenda(v.id)} 
+                          className="bg-green-100 text-green-700 px-4 py-2 rounded-xl font-black text-[10px] uppercase hover:bg-green-600 hover:text-white transition-all"
+                        >
+                          Aprovar
+                        </button>
+                        
+                        <button 
+                          onClick={() => excluirVenda(v.id)} 
+                          className="bg-red-50 text-red-500 p-2.5 rounded-xl hover:bg-red-500 hover:text-white transition-all"
+                        >
                           <Trash2 size={18} />
                         </button>
                       </td>
@@ -295,6 +349,43 @@ export default function Admin() {
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-black shadow-lg shadow-blue-100 transition-all active:scale-95 mt-4 uppercase tracking-widest text-xs"
               >
                 Salvar Produto na Lista
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL PARA ATUALIZAR PIX EXPIRADO */}
+      {isModalPixOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl w-full max-w-md p-8 relative shadow-2xl animate-in zoom-in duration-200">
+            <button onClick={() => setIsModalPixOpen(false)} className="absolute top-6 right-6 text-gray-400 hover:text-gray-900 transition-colors bg-gray-100 p-2 rounded-full"><X size={20} /></button>
+            
+            <div className="flex flex-col items-center text-center gap-4 mb-8 mt-4">
+              <div className="p-4 rounded-full bg-blue-50 text-blue-600"><Edit3 size={32} /></div>
+              <div>
+                <h2 className="text-2xl font-black text-gray-900">Atualizar Pix</h2>
+                <p className="text-gray-500 text-sm mt-2">Cole o novo código Pix Copia e Cola para este pedido.</p>
+              </div>
+            </div>
+
+            <div className="space-y-5">
+              <div>
+                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Novo Código Pix *</label>
+                <textarea 
+                  autoFocus
+                  value={novoPix} 
+                  onChange={e => setNovoPix(e.target.value)} 
+                  placeholder="Cole aqui o novo código Pix Copia e Cola..." 
+                  className="w-full p-4 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 font-mono text-[10px] h-32 resize-none custom-scrollbar" 
+                />
+              </div>
+              
+              <button 
+                onClick={salvarNovoPix} 
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-black shadow-lg shadow-blue-100 transition-all active:scale-95 mt-4 uppercase tracking-widest text-xs"
+              >
+                Salvar Novo Pix
               </button>
             </div>
           </div>
