@@ -15,7 +15,6 @@ export const RegisterForm = () => {
     telefone: '', codigo_cobranca: ''
   });
 
-  // FUNÇÃO DE MÁSCARA PARA CPF (000.000.000-00)
   const maskCPF = (value: string) => {
     return value
       .replace(/\D/g, '') 
@@ -25,7 +24,6 @@ export const RegisterForm = () => {
       .replace(/(-\d{2})\d+?$/, '$1');
   };
 
-  // FUNÇÃO DE MÁSCARA PARA TELEFONE ((00) 00000-0000)
   const maskPhone = (value: string) => {
     return value
       .replace(/\D/g, '')
@@ -36,11 +34,8 @@ export const RegisterForm = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let { name, value } = e.target;
-
-    // Aplica a máscara se for o campo de CPF ou Telefone
     if (name === 'cpf') value = maskCPF(value);
     if (name === 'telefone') value = maskPhone(value);
-
     setFormData({ ...formData, [name]: value });
   };
 
@@ -148,11 +143,11 @@ export const RegisterForm = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-1">
             <label className={labelClass}>Nome *</label>
-            <input required type="text" name="nome" value={formData.nome} onChange={handleChange} className={inputClass} />
+            <input required type="text" name="nome" value={formData.nome} onChange={handleChange} className={inputClass} placeholder="Seu nome" />
           </div>
           <div className="space-y-1">
             <label className={labelClass}>Sobrenome *</label>
-            <input required type="text" name="sobrenome" value={formData.sobrenome} onChange={handleChange} className={inputClass} />
+            <input required type="text" name="sobrenome" value={formData.sobrenome} onChange={handleChange} className={inputClass} placeholder="Seu sobrenome" />
           </div>
         </div>
 
@@ -163,18 +158,18 @@ export const RegisterForm = () => {
           </div>
           <div className="md:col-span-2 space-y-1">
             <label className={labelClass}>Rua *</label>
-            <input required type="text" name="rua" value={formData.rua} onChange={handleChange} className={inputClass} />
+            <input required type="text" name="rua" value={formData.rua} onChange={handleChange} className={inputClass} placeholder="Nome da rua" />
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="space-y-1">
             <label className={labelClass}>Número *</label>
-            <input required type="text" name="numero" value={formData.numero} onChange={handleChange} className={inputClass} />
+            <input required type="text" name="numero" value={formData.numero} onChange={handleChange} className={inputClass} placeholder="123" />
           </div>
           <div className="md:col-span-2 space-y-1">
             <label className={labelClass}>Bairro *</label>
-            <input required type="text" name="bairro" value={formData.bairro} onChange={handleChange} className={inputClass} />
+            <input required type="text" name="bairro" value={formData.bairro} onChange={handleChange} className={inputClass} placeholder="Seu bairro" />
           </div>
         </div>
 
@@ -196,7 +191,7 @@ export const RegisterForm = () => {
           <input 
             required type="text" name="codigo_cobranca" 
             value={formData.codigo_cobranca} onChange={handleChange} 
-            className="w-full p-4 border border-blue-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white transition-all font-bold" 
+            className="w-full p-4 border border-blue-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white transition-all font-bold placeholder:text-gray-300" 
             placeholder="Digite o código fornecido..."
           />
         </div>

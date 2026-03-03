@@ -13,14 +13,11 @@ const Auth = () => {
   if (session) return <Navigate to="/dashboard" replace />;
 
   return (
-    // Parent container with cleaner background and glow effects
     <div className="min-h-screen bg-gradient-to-br from-[#f8f9fa] to-[#e9ecef] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans relative overflow-hidden">
       
-      {/* Background glow effects */}
       <div className="absolute top-[-10%] left-[-5%] w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-[-10%] right-[-5%] w-96 h-96 bg-green-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-      {/* Main card container with style from target UI */}
       <div className="max-w-md mx-auto w-full bg-white/90 backdrop-blur-xl p-8 sm:p-10 rounded-[32px] shadow-2xl border border-white relative z-10">
         
         <div className="flex flex-col items-center justify-center mb-8 text-center">
@@ -39,11 +36,9 @@ const Auth = () => {
           </p>
         </div>
         
-        {/* Tab switcher with updated colors */}
         <div className="flex bg-gray-100/80 p-1.5 rounded-xl mb-8 border border-gray-200/50 relative">
           <button 
             onClick={() => setIsLogin(true)}
-            // Active tab button style
             className={`flex-1 py-3 text-xs sm:text-sm font-bold rounded-lg transition-all duration-300 uppercase tracking-wider z-10 ${
               isLogin ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-700'
             }`}
@@ -52,7 +47,6 @@ const Auth = () => {
           </button>
           <button 
             onClick={() => setIsLogin(false)}
-            // Inactive tab button style
             className={`flex-1 py-3 text-xs sm:text-sm font-bold rounded-lg transition-all duration-300 uppercase tracking-wider z-10 ${
               !isLogin ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-700'
             }`}
