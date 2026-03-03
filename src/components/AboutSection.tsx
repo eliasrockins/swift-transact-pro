@@ -1,6 +1,9 @@
 import { motion, useInView } from "framer-motion";
 import { Check, Users, Briefcase, Calendar } from "lucide-react";
 import aboutImage from "@/assets/about-company.jpg";
+import teamJoao from "@/assets/team-joao.jpg";
+import teamFernanda from "@/assets/team-fernanda.jpg";
+import teamFundadores from "@/assets/team-fundadores.jpg";
 import { useEffect, useRef, useState } from "react";
 
 const aboutItems = [
@@ -62,14 +65,17 @@ const teamMembers = [
   {
     name: "João Victor",
     role: "Atendimento e suporte técnico",
+    image: teamJoao,
   },
   {
     name: "Fernanda Castro",
     role: "Atendimento ao cliente",
+    image: teamFernanda,
   },
   {
     name: "Tiago Kart & Gustavo Kart",
     role: "CEO & Fundadores",
+    image: teamFundadores,
   },
 ];
 
@@ -242,10 +248,8 @@ const AboutSection = () => {
                 transition={{ duration: 0.5, delay: index * 0.15 }}
                 className="text-center group"
               >
-                <div className="w-40 h-40 mx-auto rounded-full bg-card border border-border glow-border flex items-center justify-center mb-6 group-hover:border-primary/40 transition-colors">
-                  <span className="text-4xl font-heading font-bold text-primary">
-                    {member.name.charAt(0)}
-                  </span>
+                <div className="w-40 h-40 mx-auto rounded-2xl overflow-hidden border border-border glow-border mb-6 group-hover:border-primary/40 transition-colors">
+                  <img src={member.image} alt={member.name} className="w-full h-full object-cover grayscale" />
                 </div>
                 <h3 className="font-heading font-bold text-xl text-foreground mb-1">{member.name}</h3>
                 <p className="text-muted-foreground text-sm">{member.role}</p>
