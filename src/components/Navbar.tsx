@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import logo from "@/assets/logo.png";
 
 const navItems = [
@@ -40,10 +41,12 @@ const Navbar = () => {
         </div>
 
         <div className="hidden lg:flex items-center gap-3">
-          <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
-            <User className="w-4 h-4" />
-            Minha Conta
-          </Button>
+          <Link to="/auth">
+            <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
+              <User className="w-4 h-4" />
+              Minha Conta
+            </Button>
+          </Link>
         </div>
 
         {/* Mobile Toggle */}
@@ -75,10 +78,12 @@ const Navbar = () => {
                   {item.label}
                 </a>
               ))}
-              <Button variant="ghost" size="sm" className="justify-start gap-2 text-muted-foreground">
-                <User className="w-4 h-4" />
-                Minha Conta
-              </Button>
+              <Link to="/auth" onClick={() => setIsOpen(false)}>
+                <Button variant="ghost" size="sm" className="justify-start gap-2 text-muted-foreground">
+                  <User className="w-4 h-4" />
+                  Minha Conta
+                </Button>
+              </Link>
             </div>
           </motion.div>
         )}
