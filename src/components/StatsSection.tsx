@@ -2,10 +2,10 @@ import { motion } from "framer-motion";
 import { Users, Briefcase, Calendar, TrendingUp } from "lucide-react";
 
 const stats = [
-  { icon: Users, value: "80+", label: "Clientes Satisfeitos" },
-  { icon: Briefcase, value: "80+", label: "Projetos Concluídos" },
-  { icon: Calendar, value: "7+", label: "Anos de Experiência" },
-  { icon: TrendingUp, value: "80+", label: "Vendedores Lucrando" },
+  { icon: Users, value: "9840", label: "Clientes Satisfeitos" },
+  { icon: Briefcase, value: "945", label: "Projetos Concluídos" },
+  { icon: Calendar, value: "9+", label: "Anos de Experiência" },
+  { icon: TrendingUp, value: "2934", label: "Vendedores Lucrando" },
 ];
 
 const StatsSection = () => {
