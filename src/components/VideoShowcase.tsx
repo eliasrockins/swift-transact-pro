@@ -13,7 +13,7 @@ const VideoShowcase = ({ videoSrc = "/videos/ck-solucoes.mp4" }: VideoShowcasePr
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="max-w-4xl mx-auto rounded-2xl overflow-hidden glow-border"
+          className="rounded-2xl overflow-hidden glow-border"
         >
           <video
             className="w-full aspect-video object-cover"
