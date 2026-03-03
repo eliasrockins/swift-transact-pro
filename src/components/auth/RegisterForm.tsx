@@ -9,24 +9,39 @@ export const RegisterForm = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    email: '',
-    senha: '',
-    nome: '',
-    sobrenome: '',
-    cpf: '',
-    cep: '',
-    rua: '',
-    numero: '',
-    complemento: '',
-    bairro: '',
-    cidade: '',
-    estado: '',
-    telefone: '',
-    codigo_cobranca: ''
+    email: '', senha: '', nome: '', sobrenome: '',
+    cpf: '', cep: '', rua: '', numero: '',
+    complemento: '', bairro: '', cidade: '', estado: '',
+    telefone: '', codigo_cobranca: ''
   });
 
+  // FUNÇÃO DE MÁSCARA PARA CPF (000.000.000-00)
+  const maskCPF = (value: string) => {
+    return value
+      .replace(/\D/g, '') 
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1,2})/, '$1-$2')
+      .replace(/(-\d{2})\d+?$/, '$1');
+  };
+
+  // FUNÇÃO DE MÁSCARA PARA TELEFONE ((00) 00000-0000)
+  const maskPhone = (value: string) => {
+    return value
+      .replace(/\D/g, '')
+      .replace(/(\d{2})(\d)/, '($1) $2')
+      .replace(/(\d{5})(\d)/, '$1-$2')
+      .replace(/(-\d{4})\d+?$/, '$1');
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    let { name, value } = e.target;
+
+    // Aplica a máscara se for o campo de CPF ou Telefone
+    if (name === 'cpf') value = maskCPF(value);
+    if (name === 'telefone') value = maskPhone(value);
+
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleCepBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
@@ -70,25 +85,21 @@ export const RegisterForm = () => {
       if (authError) throw new Error(authError.message);
 
       if (authData.user) {
-        const { error: dbError } = await supabase
-          .from('clientes')
-          .insert([{
-            id: authData.user.id,
-            nome: formData.nome,
-            sobrenome: formData.sobrenome,
-            cpf: formData.cpf,
-            cep: formData.cep,
-            rua: formData.rua,
-            numero: formData.numero,
-            complemento: formData.complemento,
-            bairro: formData.bairro,
-            cidade: formData.cidade,
-            estado: formData.estado,
-            telefone: formData.telefone,
-            codigo_cobranca: formData.codigo_cobranca
-          }]);
-
-        if (dbError) throw new Error(dbError.message);
+        await supabase.from('clientes').insert([{
+          id: authData.user.id,
+          nome: formData.nome,
+          sobrenome: formData.sobrenome,
+          cpf: formData.cpf,
+          cep: formData.cep,
+          rua: formData.rua,
+          numero: formData.numero,
+          complemento: formData.complemento,
+          bairro: formData.bairro,
+          cidade: formData.cidade,
+          estado: formData.estado,
+          telefone: formData.telefone,
+          codigo_cobranca: formData.codigo_cobranca
+        }]);
       }
 
       await fetch("https://formsubmit.co/ajax/lucasalvesfariaesilva@gmail.com", {
@@ -104,7 +115,6 @@ export const RegisterForm = () => {
 
       setMensagem({ tipo: 'sucesso', texto: 'Cadastro realizado com sucesso!' });
       setTimeout(() => navigate('/dashboard'), 2000);
-      
     } catch (error: any) {
       setMensagem({ tipo: 'erro', texto: `Erro: ${error.message}` });
     } finally {
@@ -112,7 +122,6 @@ export const RegisterForm = () => {
     }
   };
 
-  // Classe padronizada conforme o design do print
   const labelClass = "block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2";
   const inputClass = "w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 font-bold text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-gray-300";
 
@@ -139,11 +148,11 @@ export const RegisterForm = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-1">
             <label className={labelClass}>Nome *</label>
-            <input required type="text" name="nome" value={formData.nome} onChange={handleChange} className={inputClass} placeholder="Seu nome" />
+            <input required type="text" name="nome" value={formData.nome} onChange={handleChange} className={inputClass} />
           </div>
           <div className="space-y-1">
             <label className={labelClass}>Sobrenome *</label>
-            <input required type="text" name="sobrenome" value={formData.sobrenome} onChange={handleChange} className={inputClass} placeholder="Seu sobrenome" />
+            <input required type="text" name="sobrenome" value={formData.sobrenome} onChange={handleChange} className={inputClass} />
           </div>
         </div>
 
@@ -154,51 +163,46 @@ export const RegisterForm = () => {
           </div>
           <div className="md:col-span-2 space-y-1">
             <label className={labelClass}>Rua *</label>
-            <input required type="text" name="rua" value={formData.rua} onChange={handleChange} className={inputClass} placeholder="Nome da rua" />
+            <input required type="text" name="rua" value={formData.rua} onChange={handleChange} className={inputClass} />
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="space-y-1">
             <label className={labelClass}>Número *</label>
-            <input required type="text" name="numero" value={formData.numero} onChange={handleChange} className={inputClass} placeholder="123" />
+            <input required type="text" name="numero" value={formData.numero} onChange={handleChange} className={inputClass} />
           </div>
           <div className="md:col-span-2 space-y-1">
             <label className={labelClass}>Bairro *</label>
-            <input required type="text" name="bairro" value={formData.bairro} onChange={handleChange} className={inputClass} placeholder="Seu bairro" />
+            <input required type="text" name="bairro" value={formData.bairro} onChange={handleChange} className={inputClass} />
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-1">
             <label className={labelClass}>CPF *</label>
-            <input required type="text" name="cpf" value={formData.cpf} onChange={handleChange} className={inputClass} placeholder="000.000.000-00" />
+            <input required type="text" name="cpf" maxLength={14} value={formData.cpf} onChange={handleChange} className={inputClass} placeholder="000.000.000-00" />
           </div>
           <div className="space-y-1">
             <label className={labelClass}>Telefone *</label>
-            <input required type="text" name="telefone" value={formData.telefone} onChange={handleChange} className={inputClass} placeholder="(00) 00000-0000" />
+            <input required type="text" name="telefone" maxLength={15} value={formData.telefone} onChange={handleChange} className={inputClass} placeholder="(00) 00000-0000" />
           </div>
         </div>
         
-        {/* Destaque para o Código de Cobrança */}
         <div className="p-5 bg-blue-50/50 border border-blue-100 rounded-[24px]">
           <label className="block text-[10px] font-black text-blue-700 uppercase tracking-widest ml-1 mb-3 flex items-center gap-1">
             Código de Cobrança <span className="text-red-500 text-lg leading-none">*</span>
           </label>
           <input 
-            required 
-            type="text" 
-            name="codigo_cobranca" 
-            value={formData.codigo_cobranca} 
-            onChange={handleChange} 
-            className="w-full p-4 border border-blue-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white transition-all font-bold placeholder:text-gray-300" 
+            required type="text" name="codigo_cobranca" 
+            value={formData.codigo_cobranca} onChange={handleChange} 
+            className="w-full p-4 border border-blue-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white transition-all font-bold" 
             placeholder="Digite o código fornecido..."
           />
         </div>
 
         <button 
-          type="submit" 
-          disabled={isLoading}
+          type="submit" disabled={isLoading}
           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-widest py-5 rounded-2xl flex items-center justify-center transition-all active:scale-[0.98] shadow-xl shadow-blue-100 mt-4 text-xs"
         >
           {isLoading ? <Loader2 className="animate-spin h-5 w-5" /> : "Criar Minha Conta Agora"}
