@@ -28,7 +28,7 @@ const Navbar = () => {
       <div className="container mx-auto px-6 py-4 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
           <img src={logo} alt="CK Soluções" className="w-10 h-10" />
-          <span className="font-heading font-bold text-xl text-foreground">
+          <span className="font-heading font-bold text-xl text-white">
             CK Soluções
           </span>
         </Link>
@@ -41,8 +41,8 @@ const Navbar = () => {
               to={item.href}
               className={`text-sm transition-colors ${
                 location.pathname === item.href
-                  ? "text-primary font-medium"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "text-primary font-bold"
+                  : "text-white font-medium hover:text-primary"
               }`}
             >
               {item.label}
@@ -52,7 +52,7 @@ const Navbar = () => {
 
         <div className="hidden lg:flex items-center gap-3">
           <Link to={authLink}>
-            <Button variant="ghost" size="sm" className="gap-2">
+            <Button variant="ghost" size="sm" className="gap-2 text-white hover:text-primary hover:bg-white/10">
               <User className="w-4 h-4" />
               {session ? "Meu Painel" : "Minha Conta"}
             </Button>
@@ -62,7 +62,7 @@ const Navbar = () => {
         {/* Mobile Toggle */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="lg:hidden text-foreground"
+          className="lg:hidden text-white"
         >
           {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
@@ -75,7 +75,7 @@ const Navbar = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden glass border-t border-border/50 overflow-hidden"
+            className="lg:hidden glass border-t border-border/50 overflow-hidden bg-[#0D0D1A]/95"
           >
             <div className="container mx-auto px-6 py-4 flex flex-col gap-4">
               {navItems.map((item) => (
@@ -85,15 +85,15 @@ const Navbar = () => {
                   onClick={() => setIsOpen(false)}
                   className={`transition-colors py-2 ${
                     location.pathname === item.href
-                      ? "text-primary font-medium"
-                      : "text-muted-foreground hover:text-foreground"
+                      ? "text-primary font-bold"
+                      : "text-white font-medium hover:text-primary"
                   }`}
                 >
                   {item.label}
                 </Link>
               ))}
               <Link to={authLink} onClick={() => setIsOpen(false)}>
-                <Button variant="ghost" size="sm" className="justify-start gap-2 w-full">
+                <Button variant="ghost" size="sm" className="justify-start gap-2 w-full text-white hover:text-primary hover:bg-white/10">
                   <User className="w-4 h-4" />
                   {session ? "Meu Painel" : "Minha Conta"}
                 </Button>
