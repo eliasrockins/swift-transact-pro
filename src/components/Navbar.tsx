@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import logo from "@/assets/logo.png";
 
 const navItems = [
@@ -18,6 +19,9 @@ const navItems = [
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { session } = useAuth();
+
+  const authLink = session ? "/dashboard" : "/auth";
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-border/50">
@@ -47,10 +51,10 @@ const Navbar = () => {
         </div>
 
         <div className="hidden lg:flex items-center gap-3">
-          <Link to="/auth">
-            <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
+          <Link to={authLink}>
+            <Button variant="ghost" size="sm" className="gap-2">
               <User className="w-4 h-4" />
-              Minha Conta
+              {session ? "Meu Painel" : "Minha Conta"}
             </Button>
           </Link>
         </div>
@@ -71,7 +75,7 @@ const Navbar = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden glass border-t border-border/50"
+            className="lg:hidden glass border-t border-border/50 overflow-hidden"
           >
             <div className="container mx-auto px-6 py-4 flex flex-col gap-4">
               {navItems.map((item) => (
@@ -88,10 +92,10 @@ const Navbar = () => {
                   {item.label}
                 </Link>
               ))}
-              <Link to="/auth" onClick={() => setIsOpen(false)}>
-                <Button variant="ghost" size="sm" className="justify-start gap-2 text-muted-foreground">
+              <Link to={authLink} onClick={() => setIsOpen(false)}>
+                <Button variant="ghost" size="sm" className="justify-start gap-2 w-full">
                   <User className="w-4 h-4" />
-                  Minha Conta
+                  {session ? "Meu Painel" : "Minha Conta"}
                 </Button>
               </Link>
             </div>
