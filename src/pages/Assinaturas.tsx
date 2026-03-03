@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Circle, Globe, Diamond, ChevronsRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppPopup from "@/components/WhatsAppPopup";
@@ -43,6 +44,7 @@ const plans = [
 ];
 
 const Assinaturas = () => {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -100,7 +102,10 @@ const Assinaturas = () => {
                   ))}
                 </ul>
 
-                <Button className="w-fit bg-primary hover:bg-primary/90 text-primary-foreground font-bold uppercase tracking-wider">
+                <Button
+                  onClick={() => navigate(`/pagamento?plano=${encodeURIComponent(plan.name)}&valor=${plan.price}`)}
+                  className="w-fit bg-primary hover:bg-primary/90 text-primary-foreground font-bold uppercase tracking-wider"
+                >
                   Assinar
                 </Button>
               </motion.div>
