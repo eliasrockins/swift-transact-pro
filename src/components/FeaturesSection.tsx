@@ -34,7 +34,7 @@ const FeaturesSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.15 }}
-              className="relative group p-8 rounded-2xl bg-card border border-border hover:glow-border transition-all duration-300"
+              className="relative group p-8 rounded-2xl bg-card border border-border hover:bg-primary hover:border-primary transition-all duration-300"
             >
               <div className="absolute top-4 right-6 text-6xl font-heading font-bold text-muted/50">
                 {feature.number}
