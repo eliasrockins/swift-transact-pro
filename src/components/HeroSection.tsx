@@ -39,9 +39,9 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-5xl md:text-7xl font-heading font-bold leading-tight mb-6"
-          >
-            Soluções inteligentes{" "}
+              className="text-5xl md:text-7xl font-heading font-bold leading-tight mb-6"
+            >
+              CK Soluções inteligentes{" "}
             <span className="text-gradient">para o seu negócio</span>
           </motion.h1>
 
