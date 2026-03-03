@@ -6,8 +6,8 @@ interface VideoShowcaseProps {
 
 const VideoShowcase = ({ videoSrc = "/videos/ck-solucoes.mp4" }: VideoShowcaseProps) => {
   return (
-    <section className="py-20 relative">
-      <div className="container mx-auto px-6">
+    <section className="py-10 md:py-20 relative">
+      <div className="container mx-auto px-2 md:px-6">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
