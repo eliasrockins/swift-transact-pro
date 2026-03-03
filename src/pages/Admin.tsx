@@ -1,13 +1,18 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext'; // NOVO: Para fazer o logout
+import { useNavigate } from 'react-router-dom'; // NOVO: Para redirecionar após sair
 import { 
-  Users, ShoppingCart, Check, Trash2, 
-  RefreshCcw, Search, CreditCard, AlertCircle, Package 
+  Users, ShoppingCart, Trash2, 
+  RefreshCcw, CreditCard, AlertCircle, Package, Plus, X, LogOut 
 } from 'lucide-react';
 import { toast } from "sonner";
 import logo from "@/assets/logo.png";
 
 export default function Admin() {
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
+
   const [vendas, setVendas] = useState<any[]>([]);
   const [clientes, setClientes] = useState<any[]>([]);
   const [produtosDB, setProdutosDB] = useState<any[]>([]); 
@@ -18,6 +23,11 @@ export default function Admin() {
   const [produtoSelecionado, setProdutoSelecionado] = useState<any>(null); 
   const [valor, setValor] = useState('');
   const [pixCode, setPixCode] = useState('');
+
+  // ESTADOS DO NOVO MODAL DE PRODUTOS
+  const [isModalProdutoOpen, setIsModalProdutoOpen] = useState(false);
+  const [novoProdutoNome, setNovoProdutoNome] = useState('');
+  const [novoProdutoValor, setNovoProdutoValor] = useState('');
 
   useEffect(() => {
     carregarDados();
@@ -43,6 +53,12 @@ export default function Admin() {
       setLoading(false);
     }
   }
+
+  // FUNÇÃO DE SAIR (LOGOUT)
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/auth');
+  };
 
   const excluirVenda = async (id: string) => {
     if (!window.confirm("Excluir esta venda permanentemente?")) return;
@@ -70,25 +86,50 @@ export default function Admin() {
     carregarDados();
   };
 
+  // FUNÇÃO QUE CONECTA COM O SUPABASE PARA CRIAR O PRODUTO
+  const cadastrarNovoProduto = async () => {
+    if (!novoProdutoNome.trim()) return toast.error("O nome do produto é obrigatório.");
+
+    const { error } = await supabase.from('produtos').insert([{
+      nome: novoProdutoNome,
+      valor_sugerido: novoProdutoValor ? parseFloat(novoProdutoValor) : 0
+    }]);
+
+    if (error) return toast.error("Erro ao salvar o produto.");
+
+    toast.success("Produto cadastrado com sucesso!");
+    setIsModalProdutoOpen(false);
+    setNovoProdutoNome(''); 
+    setNovoProdutoValor('');
+    carregarDados(); 
+  };
+
   if (loading) return <div className="flex h-screen items-center justify-center text-blue-600 font-bold">SINCRONIZANDO...</div>;
 
   const vendasPendentes = vendas.filter(v => v.status?.toLowerCase() === 'pendente');
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] p-4 md:p-8 font-sans">
+    <div className="min-h-screen bg-[#f8fafc] p-4 md:p-8 font-sans relative">
+      
+      {/* HEADER COM O BOTÃO DE SAIR */}
       <header className="max-w-7xl mx-auto mb-10 flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
         <div className="flex items-center gap-4">
           <img src={logo} alt="Logo" className="h-12 w-auto object-contain" />
-          <h1 className="text-2xl font-black text-gray-900">Painel Administrativo</h1>
+          <h1 className="text-xl md:text-2xl font-black text-gray-900">Painel Administrativo</h1>
         </div>
-        <button onClick={carregarDados} className="p-3 bg-gray-50 rounded-xl hover:bg-blue-50 transition-all">
-          <RefreshCcw size={22} className="text-gray-900" />
-        </button>
+        <div className="flex items-center gap-3">
+          <button onClick={carregarDados} className="p-3 bg-gray-50 rounded-xl hover:bg-blue-50 transition-all text-gray-900" title="Atualizar dados">
+            <RefreshCcw size={22} />
+          </button>
+          <button onClick={handleLogout} className="flex items-center gap-2 px-4 py-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-all font-bold text-sm">
+            <LogOut size={20} /> <span className="hidden sm:inline">Sair</span>
+          </button>
+        </div>
       </header>
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {/* 1. SELECIONAR CLIENTE (Texto em Preto) */}
+        {/* 1. SELECIONAR CLIENTE */}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
           <h2 className="text-xs font-black text-blue-600 uppercase mb-6 flex items-center gap-2 tracking-widest">
             <Users size={16}/> 1. Escolher Cliente
@@ -103,7 +144,7 @@ export default function Admin() {
               <button 
                 key={c.id} 
                 onClick={() => setClienteSelecionado(c)} 
-                className={`w-full text-left p-4 rounded-xl text-sm font-bold border transition-all ${clienteSelecionado?.id === c.id ? 'bg-blue-600 text-white' : 'bg-gray-50 text-gray-900 hover:border-gray-400'}`}
+                className={`w-full text-left p-4 rounded-xl text-sm font-bold border transition-all ${clienteSelecionado?.id === c.id ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-50 text-gray-900 hover:border-gray-400'}`}
               >
                 {c.nome} {c.sobrenome}
               </button>
@@ -111,7 +152,7 @@ export default function Admin() {
           </div>
         </div>
 
-        {/* 2. SELECIONAR PRODUTO (Ajustado para text-gray-900) */}
+        {/* 2. NOVO PEDIDO */}
         <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
           <h2 className="text-xs font-black text-green-600 uppercase mb-6 flex items-center gap-2 tracking-widest">
             <ShoppingCart size={16}/> 2. Novo Pedido
@@ -119,10 +160,10 @@ export default function Admin() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
              <div className="p-4 bg-blue-50 border border-blue-100 rounded-xl text-blue-800 font-black text-sm">
-                {clienteSelecionado ? `${clienteSelecionado.nome} ${clienteSelecionado.sobrenome}` : 'Selecione um cliente'}
+                {clienteSelecionado ? `${clienteSelecionado.nome} ${clienteSelecionado.sobrenome}` : 'Selecione um cliente ao lado'}
              </div>
              <input 
-               type="number" placeholder="Valor (R$)" 
+               type="number" placeholder="Valor Cobrado (R$)" 
                className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl text-sm font-black text-gray-900 outline-none focus:ring-2 focus:ring-green-500" 
                value={valor} 
                onChange={e => setValor(e.target.value)} 
@@ -130,15 +171,25 @@ export default function Admin() {
           </div>
 
           <div className="mb-6">
-            <label className="text-[10px] font-black text-gray-500 uppercase ml-2 mb-2 block">Selecione o Produto (Lista atualizada)</label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-48 overflow-y-auto p-1">
+            {/* BOTÃO CRIAR PRODUTO ADICIONADO AQUI */}
+            <div className="flex justify-between items-center mb-3 p-2 bg-gray-50 rounded-xl border border-gray-100">
+              <label className="text-[10px] font-black text-gray-500 uppercase ml-2">Selecione o Produto</label>
+              <button 
+                onClick={() => setIsModalProdutoOpen(true)}
+                className="text-[10px] font-black text-white uppercase bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700 transition-all flex items-center gap-2 active:scale-95 shadow-md shadow-blue-200"
+              >
+                <Plus size={14} /> Criar Produto
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-48 overflow-y-auto p-1 custom-scrollbar">
               {produtosDB.map(p => (
                 <button 
                   key={p.id}
                   onClick={() => setProdutoSelecionado(p)}
-                  className={`flex items-center gap-3 p-3 rounded-xl border text-xs font-bold transition-all ${produtoSelecionado?.id === p.id ? 'bg-green-600 text-white border-green-600 shadow-md' : 'bg-white text-gray-900 border-gray-200 hover:border-green-500'}`}
+                  className={`flex items-center gap-3 p-3 rounded-xl border text-xs font-bold transition-all text-left ${produtoSelecionado?.id === p.id ? 'bg-green-600 text-white border-green-600 shadow-md' : 'bg-white text-gray-900 border-gray-200 hover:border-green-500'}`}
                 >
-                  <Package size={16} /> {p.nome}
+                  <Package size={16} className="shrink-0" /> <span className="truncate">{p.nome}</span>
                 </button>
               ))}
             </div>
@@ -153,18 +204,21 @@ export default function Admin() {
           
           <button 
             onClick={lancarVenda} 
-            className="w-full bg-green-500 hover:bg-green-600 text-white py-5 rounded-2xl font-black uppercase tracking-widest transition-all active:scale-95"
+            className="w-full bg-green-500 hover:bg-green-600 text-white py-5 rounded-2xl font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-green-200"
           >
             Lançar Venda Oficial
           </button>
         </div>
 
-        {/* TABELA (Texto Reforçado) */}
+        {/* TABELA DE VENDAS */}
         <div className="lg:col-span-3 bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="p-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/30">
             <h2 className="text-xs font-black text-blue-600 uppercase tracking-widest flex items-center gap-2">
               <CreditCard size={16}/> Vendas Pendentes
             </h2>
+            <span className="bg-blue-100 text-blue-700 px-4 py-1.5 rounded-full text-[10px] font-black">
+              {vendasPendentes.length} AGUARDANDO
+            </span>
           </div>
           <div className="overflow-x-auto">
             {vendasPendentes.length === 0 ? (
@@ -186,7 +240,7 @@ export default function Admin() {
                       <td className="px-8 py-6 text-gray-900 text-xs font-bold italic">{v.produto}</td>
                       <td className="px-8 py-6 font-black text-green-600 text-lg">R$ {v.valor}</td>
                       <td className="px-8 py-6 flex justify-center gap-3">
-                        <button className="bg-green-100 text-green-700 px-4 py-2 rounded-xl font-black text-[10px] uppercase">Aprovar</button>
+                        <button className="bg-green-100 text-green-700 px-4 py-2 rounded-xl font-black text-[10px] uppercase hover:bg-green-600 hover:text-white transition-all">Aprovar</button>
                         <button onClick={() => excluirVenda(v.id)} className="bg-red-50 text-red-500 p-2.5 rounded-xl hover:bg-red-500 hover:text-white transition-all">
                           <Trash2 size={18} />
                         </button>
@@ -199,6 +253,53 @@ export default function Admin() {
           </div>
         </div>
       </div>
+
+      {/* MODAL PARA CRIAR NOVO PRODUTO */}
+      {isModalProdutoOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl w-full max-w-md p-8 relative shadow-2xl animate-in zoom-in duration-200">
+            <button onClick={() => setIsModalProdutoOpen(false)} className="absolute top-6 right-6 text-gray-400 hover:text-gray-900 transition-colors bg-gray-100 p-2 rounded-full"><X size={20} /></button>
+            
+            <div className="flex flex-col items-center text-center gap-4 mb-8 mt-4">
+              <div className="p-4 rounded-full bg-blue-50 text-blue-600"><Package size={32} /></div>
+              <div>
+                <h2 className="text-2xl font-black text-gray-900">Novo Produto</h2>
+                <p className="text-gray-500 text-sm mt-2">Cadastre um novo item no banco de dados.</p>
+              </div>
+            </div>
+
+            <div className="space-y-5">
+              <div>
+                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Nome do Produto / Aparelho *</label>
+                <input 
+                  autoFocus
+                  value={novoProdutoNome} 
+                  onChange={e => setNovoProdutoNome(e.target.value)} 
+                  placeholder="Ex: iPhone 14 Pro Max 256GB" 
+                  className="w-full p-4 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 font-bold placeholder:text-gray-300" 
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Valor Sugerido (R$) - Opcional</label>
+                <input 
+                  type="number" 
+                  value={novoProdutoValor} 
+                  onChange={e => setNovoProdutoValor(e.target.value)} 
+                  placeholder="Ex: 5500" 
+                  className="w-full p-4 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 font-bold placeholder:text-gray-300" 
+                />
+              </div>
+              
+              <button 
+                onClick={cadastrarNovoProduto} 
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-black shadow-lg shadow-blue-100 transition-all active:scale-95 mt-4 uppercase tracking-widest text-xs"
+              >
+                Salvar Produto na Lista
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
