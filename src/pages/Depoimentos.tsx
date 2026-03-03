@@ -1,21 +1,19 @@
 import Navbar from "@/components/Navbar";
-import HeroSection from "@/components/HeroSection";
-import StatsSection from "@/components/StatsSection";
-import CTASection from "@/components/CTASection";
+import TestimonialsSection from "@/components/TestimonialsSection";
 import Footer from "@/components/Footer";
 import WhatsAppPopup from "@/components/WhatsAppPopup";
 
-const Index = () => {
+const Depoimentos = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <HeroSection />
-      <StatsSection />
-      <CTASection />
+      <div className="pt-20">
+        <TestimonialsSection />
+      </div>
       <Footer />
       <WhatsAppPopup />
     </div>
   );
 };
 
-export default Index;
+export default Depoimentos;

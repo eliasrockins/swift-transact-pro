@@ -1,21 +1,19 @@
 import Navbar from "@/components/Navbar";
-import HeroSection from "@/components/HeroSection";
-import StatsSection from "@/components/StatsSection";
-import CTASection from "@/components/CTASection";
+import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
 import WhatsAppPopup from "@/components/WhatsAppPopup";
 
-const Index = () => {
+const FAQ = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <HeroSection />
-      <StatsSection />
-      <CTASection />
+      <div className="pt-20">
+        <FAQSection />
+      </div>
       <Footer />
       <WhatsAppPopup />
     </div>
   );
 };
 
-export default Index;
+export default FAQ;
