@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 
 const videoSlots = [
-  { id: 1, src: "/videos/depoimento-1.mov", type: "video/mp4" },
+  { id: 1, src: "/videos/depoimento-1.mov", type: "video/mp4", poster: "/images/depoimento-1-poster.png" },
   { id: 2, src: "/videos/depoimento-2.mp4", type: "video/mp4" },
   { id: 3, src: "/videos/depoimento-3.mp4", type: "video/mp4" },
   { id: 4, src: "/videos/depoimento-4.mp4", type: "video/mp4" },
@@ -44,6 +44,7 @@ const TestimonialsSection = () => {
                 controls
                 playsInline
                 preload="metadata"
+                poster={slot.poster}
               >
                 <source src={slot.src} type={slot.type} />
               </video>
