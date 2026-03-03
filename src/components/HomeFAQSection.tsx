@@ -25,7 +25,7 @@ const faqItems = [
   {
     question: "É possível pagar com cartão de crédito?",
     answer:
-      "Sim, aceitamos pagamentos via cartão de crédito, PIX e boleto bancário. Todas as transações são processadas de forma segura através de nossa plataforma.",
+      "O pagamento é apenas a vista por Pix caso deseje parcelar usando cartão de crédito, sugerimos que pegue empréstimo PIX em seu banco utilizando seu cartão de crédito.",
   },
   {
     question: "Como solicito o reembolso caso precise ?",
