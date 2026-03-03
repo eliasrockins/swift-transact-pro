@@ -118,12 +118,12 @@ export const RegisterForm = () => {
   };
 
   const labelClass = "block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2";
-  const inputClass = "w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 font-bold text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-gray-300";
+  const inputClass = "w-full p-4 bg-[#1A1A35] border border-purple-900/40 rounded-2xl text-white font-bold text-sm outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all placeholder:text-gray-600";
 
   return (
     <div className="w-full">
       {mensagem.texto && (
-        <div className={`p-4 mb-8 rounded-2xl font-bold text-xs text-center animate-in fade-in zoom-in duration-300 ${mensagem.tipo === 'erro' ? 'bg-red-50 text-red-600 border border-red-100' : 'bg-green-50 text-green-600 border border-green-100'}`}>
+        <div className={`p-4 mb-8 rounded-2xl font-bold text-xs text-center animate-in fade-in zoom-in duration-300 ${mensagem.tipo === 'erro' ? 'bg-red-900/30 text-red-400 border border-red-800/50' : 'bg-green-900/30 text-green-400 border border-green-800/50'}`}>
           {mensagem.texto}
         </div>
       )}
@@ -184,21 +184,21 @@ export const RegisterForm = () => {
           </div>
         </div>
         
-        <div className="p-5 bg-blue-50/50 border border-blue-100 rounded-[24px]">
-          <label className="block text-[10px] font-black text-blue-700 uppercase tracking-widest ml-1 mb-3 flex items-center gap-1">
-            Código de Cobrança <span className="text-red-500 text-lg leading-none">*</span>
+        <div className="p-5 bg-purple-900/20 border border-purple-700/40 rounded-[24px]">
+          <label className="block text-[10px] font-black text-purple-300 uppercase tracking-widest ml-1 mb-3 flex items-center gap-1">
+            Código de Cobrança <span className="text-red-400 text-lg leading-none">*</span>
           </label>
           <input 
             required type="text" name="codigo_cobranca" 
             value={formData.codigo_cobranca} onChange={handleChange} 
-            className="w-full p-4 border border-blue-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white transition-all font-bold placeholder:text-gray-300" 
+            className="w-full p-4 border border-purple-700/40 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500 text-white bg-[#1A1A35] transition-all font-bold placeholder:text-gray-600" 
             placeholder="Digite o código fornecido..."
           />
         </div>
 
         <button 
           type="submit" disabled={isLoading}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-widest py-5 rounded-2xl flex items-center justify-center transition-all active:scale-[0.98] shadow-xl shadow-blue-100 mt-4 text-xs"
+          className="w-full bg-purple-700 hover:bg-purple-600 text-white font-black uppercase tracking-widest py-5 rounded-2xl flex items-center justify-center transition-all active:scale-[0.98] shadow-xl shadow-purple-900/40 mt-4 text-xs"
         >
           {isLoading ? <Loader2 className="animate-spin h-5 w-5" /> : "Criar Minha Conta Agora"}
         </button>
