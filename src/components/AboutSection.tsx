@@ -232,7 +232,7 @@ const AboutSection = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <span className="text-primary font-medium text-sm uppercase tracking-wider">Our Expert People</span>
+            <span className="text-primary font-medium text-sm uppercase tracking-wider">Nosso Time</span>
             <h2 className="text-3xl md:text-4xl font-heading font-bold mt-3 text-foreground">
               Conheça nosso <span className="text-gradient">time</span>
             </h2>
