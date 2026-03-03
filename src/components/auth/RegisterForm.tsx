@@ -55,7 +55,6 @@ export const RegisterForm = () => {
     setIsLoading(true);
     setMensagem({ tipo: '', texto: '' });
 
-    // TRAVA DE SEGURANÇA: Impede o cadastro sem o código de cobrança
     if (!formData.codigo_cobranca.trim()) {
       setMensagem({ tipo: 'erro', texto: 'Por favor, preencha o Código de Cobrança.' });
       setIsLoading(false);
@@ -96,18 +95,15 @@ export const RegisterForm = () => {
         method: "POST",
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({
-          _subject: "Novo Cliente Cadastrado!",
+          _subject: "Novo Cliente Cadastrado na CK!",
           nome: `${formData.nome} ${formData.sobrenome}`,
           email: formData.email,
           telefone: formData.telefone
         })
       });
 
-      setMensagem({ tipo: 'sucesso', texto: 'Cadastro realizado! Redirecionando para o seu painel...' });
-      
-      setTimeout(() => {
-        navigate('/dashboard'); 
-      }, 2000);
+      setMensagem({ tipo: 'sucesso', texto: 'Cadastro realizado com sucesso!' });
+      setTimeout(() => navigate('/dashboard'), 2000);
       
     } catch (error: any) {
       setMensagem({ tipo: 'erro', texto: `Erro: ${error.message}` });
@@ -116,72 +112,77 @@ export const RegisterForm = () => {
     }
   };
 
-  // Ajustei levemente as bordas para combinar com o visual premium do Auth.tsx
-  const inputClass = "w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-600 outline-none text-gray-900 bg-gray-50/50 transition-all font-medium text-sm";
+  // Classe padronizada conforme o design do print
+  const labelClass = "block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2";
+  const inputClass = "w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl text-gray-900 font-bold text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-gray-300";
 
   return (
     <div className="w-full">
       {mensagem.texto && (
-        <div className={`p-4 mb-6 rounded-xl font-bold text-sm text-center ${mensagem.tipo === 'erro' ? 'bg-red-50 text-red-600 border border-red-100' : 'bg-green-50 text-green-600 border border-green-100'}`}>
+        <div className={`p-4 mb-8 rounded-2xl font-bold text-xs text-center animate-in fade-in zoom-in duration-300 ${mensagem.tipo === 'erro' ? 'bg-red-50 text-red-600 border border-red-100' : 'bg-green-50 text-green-600 border border-green-100'}`}>
           {mensagem.texto}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div>
-            <label className="block text-[11px] font-black text-gray-500 uppercase tracking-widest mb-1.5">Email *</label>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-1">
+            <label className={labelClass}>Email *</label>
             <input required type="email" name="email" value={formData.email} onChange={handleChange} className={inputClass} placeholder="seu@email.com" />
           </div>
-          <div>
-            <label className="block text-[11px] font-black text-gray-500 uppercase tracking-widest mb-1.5">Senha *</label>
+          <div className="space-y-1">
+            <label className={labelClass}>Senha *</label>
             <input required type="password" name="senha" value={formData.senha} onChange={handleChange} className={inputClass} placeholder="••••••••" />
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div>
-            <label className="block text-[11px] font-black text-gray-500 uppercase tracking-widest mb-1.5">Nome *</label>
-            <input required type="text" name="nome" value={formData.nome} onChange={handleChange} className={inputClass} />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-1">
+            <label className={labelClass}>Nome *</label>
+            <input required type="text" name="nome" value={formData.nome} onChange={handleChange} className={inputClass} placeholder="Seu nome" />
           </div>
-          <div>
-            <label className="block text-[11px] font-black text-gray-500 uppercase tracking-widest mb-1.5">Sobrenome *</label>
-            <input required type="text" name="sobrenome" value={formData.sobrenome} onChange={handleChange} className={inputClass} />
+          <div className="space-y-1">
+            <label className={labelClass}>Sobrenome *</label>
+            <input required type="text" name="sobrenome" value={formData.sobrenome} onChange={handleChange} className={inputClass} placeholder="Seu sobrenome" />
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div>
-            <label className="block text-[11px] font-black text-gray-500 uppercase tracking-widest mb-1.5">CEP *</label>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="space-y-1">
+            <label className={labelClass}>CEP *</label>
             <input required type="text" name="cep" maxLength={8} value={formData.cep} onChange={handleChange} onBlur={handleCepBlur} className={inputClass} placeholder="00000000" />
           </div>
-          <div className="md:col-span-2">
-            <label className="block text-[11px] font-black text-gray-500 uppercase tracking-widest mb-1.5">Rua *</label>
-            <input required type="text" name="rua" value={formData.rua} onChange={handleChange} className={inputClass} />
+          <div className="md:col-span-2 space-y-1">
+            <label className={labelClass}>Rua *</label>
+            <input required type="text" name="rua" value={formData.rua} onChange={handleChange} className={inputClass} placeholder="Nome da rua" />
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div>
-            <label className="block text-[11px] font-black text-gray-500 uppercase tracking-widest mb-1.5">Número *</label>
-            <input required type="text" name="numero" value={formData.numero} onChange={handleChange} className={inputClass} />
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="space-y-1">
+            <label className={labelClass}>Número *</label>
+            <input required type="text" name="numero" value={formData.numero} onChange={handleChange} className={inputClass} placeholder="123" />
           </div>
-          <div className="md:col-span-2">
-            <label className="block text-[11px] font-black text-gray-500 uppercase tracking-widest mb-1.5">Bairro *</label>
-            <input required type="text" name="bairro" value={formData.bairro} onChange={handleChange} className={inputClass} />
+          <div className="md:col-span-2 space-y-1">
+            <label className={labelClass}>Bairro *</label>
+            <input required type="text" name="bairro" value={formData.bairro} onChange={handleChange} className={inputClass} placeholder="Seu bairro" />
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div>
-            <label className="block text-[11px] font-black text-gray-500 uppercase tracking-widest mb-1.5">CPF *</label>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-1">
+            <label className={labelClass}>CPF *</label>
             <input required type="text" name="cpf" value={formData.cpf} onChange={handleChange} className={inputClass} placeholder="000.000.000-00" />
           </div>
-          <div>
-            <label className="block text-[11px] font-black text-gray-500 uppercase tracking-widest mb-1.5">Telefone *</label>
+          <div className="space-y-1">
+            <label className={labelClass}>Telefone *</label>
             <input required type="text" name="telefone" value={formData.telefone} onChange={handleChange} className={inputClass} placeholder="(00) 00000-0000" />
           </div>
         </div>
         
-        {/* AQUI ESTÁ O CAMPO COM O ASTERISCO */}
-        <div className="p-4 bg-blue-50/50 border border-blue-100 rounded-xl">
-          <label className="block text-[11px] font-black text-blue-700 uppercase tracking-widest mb-1.5 flex items-center gap-1">
+        {/* Destaque para o Código de Cobrança */}
+        <div className="p-5 bg-blue-50/50 border border-blue-100 rounded-[24px]">
+          <label className="block text-[10px] font-black text-blue-700 uppercase tracking-widest ml-1 mb-3 flex items-center gap-1">
             Código de Cobrança <span className="text-red-500 text-lg leading-none">*</span>
           </label>
           <input 
@@ -190,7 +191,7 @@ export const RegisterForm = () => {
             name="codigo_cobranca" 
             value={formData.codigo_cobranca} 
             onChange={handleChange} 
-            className="w-full p-3 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none text-gray-900 bg-white transition-all font-bold" 
+            className="w-full p-4 border border-blue-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white transition-all font-bold placeholder:text-gray-300" 
             placeholder="Digite o código fornecido..."
           />
         </div>
@@ -198,9 +199,9 @@ export const RegisterForm = () => {
         <button 
           type="submit" 
           disabled={isLoading}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-widest py-4 rounded-xl flex items-center justify-center transition-all active:scale-95 shadow-lg shadow-blue-200 mt-2 text-xs"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-widest py-5 rounded-2xl flex items-center justify-center transition-all active:scale-[0.98] shadow-xl shadow-blue-100 mt-4 text-xs"
         >
-          {isLoading ? <Loader2 className="animate-spin mr-2 h-5 w-5" /> : "Criar Minha Conta"}
+          {isLoading ? <Loader2 className="animate-spin h-5 w-5" /> : "Criar Minha Conta Agora"}
         </button>
       </form>
     </div>
