@@ -1,5 +1,6 @@
 import { motion, useInView } from "framer-motion";
 import { Check, Users, Briefcase, Calendar } from "lucide-react";
+import aboutImage from "@/assets/about-company.jpg";
 import { useEffect, useRef, useState } from "react";
 
 const aboutItems = [
@@ -87,16 +88,12 @@ const AboutSection = () => {
               transition={{ duration: 0.6 }}
               className="relative"
             >
-              <div className="relative rounded-2xl overflow-hidden" style={{ borderLeft: '4px solid hsl(var(--primary))' }}>
-                <video
+            <div className="relative rounded-2xl overflow-hidden" style={{ borderLeft: '4px solid hsl(var(--primary))' }}>
+                <img
+                  src={aboutImage}
+                  alt="Equipe CK Soluções"
                   className="w-full aspect-[4/3] object-cover"
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                >
-                  <source src="/videos/about-video.mov" type="video/quicktime" />
-                </video>
+                />
               </div>
             </motion.div>
 
