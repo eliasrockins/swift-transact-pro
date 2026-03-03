@@ -25,7 +25,7 @@ const faqs = [
   {
     question: "É necessário cadastro? Como realizo uma compra?",
     answer:
-      'Sim! O cadastro pode ser feito pelo próprio cliente. Após se cadastrar, haverá um campo "Código da Cobrança" onde o vendedor irá passar o código para que a venda seja registrada. Basta aguardar o e-mail com todas as informações do produto, entrega e pagamento.',
+      'Sim! O cadastro pode ser feito pelo próprio cliente, haverá um campo chamado "Código da Cobrança" onde o vendedor(a) irá lhe passar o código, para que a venda seja registrada digite o "Código da Cobrança" no momento do Cadastro, aguarde alguns minutos e seu produto estará em seu Perfil pronto para pagamento.',
   },
   {
     question: "Como solicito o reembolso caso precise?",
