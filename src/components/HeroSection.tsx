@@ -61,14 +61,14 @@ const HeroSection = () => {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="flex flex-col sm:flex-row gap-4"
           >
-            <Button onClick={() => navigate("/sobre-nos")} size="lg" className="text-base px-8 py-6 gap-2 bg-primary hover:bg-primary/90 text-primary-foreground glow-box">
-              Saiba Mais
-              <ArrowRight className="w-5 h-5" />
-            </Button>
-            
-            {/* O SEGREDO ESTÁ AQUI NA LINHA ABAIXO 👇 */}
-            <Button onClick={() => navigate("/auth?aba=cadastro")} size="lg" variant="outline" className="text-base px-8 py-6 border-border hover:bg-secondary">
+            {/* NOVO BOTÃO ÚNICO E DESTACADO */}
+            <Button 
+              onClick={() => navigate("/auth?aba=cadastro")} 
+              size="lg" 
+              className="text-base px-8 py-6 gap-2 bg-primary hover:bg-primary/90 text-primary-foreground glow-box w-full sm:w-auto"
+            >
               Criar Conta
+              <ArrowRight className="w-5 h-5" />
             </Button>
           </motion.div>
         </div>
