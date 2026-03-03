@@ -41,9 +41,10 @@ export default function Admin() {
   async function carregarDados() {
     setLoading(true);
     try {
+      // NOVO: Adicionado 'telefone' na busca das vendas para mostrar na tabela
       const { data: sales } = await supabase
         .from('vendas')
-        .select('*, clientes(nome, sobrenome)')
+        .select('*, clientes(nome, sobrenome, telefone)')
         .order('created_at', { ascending: false });
       
       const { data: clients } = await supabase.from('clientes').select('*').order('nome');
@@ -117,7 +118,6 @@ export default function Admin() {
     carregarDados(); 
   };
 
-  // FUNÇÕES DE EDIÇÃO DE PIX
   const abrirModalPix = (venda: any) => {
     setVendaEditando(venda);
     setNovoPix(venda.pix_copia_cola || '');
@@ -180,9 +180,13 @@ export default function Admin() {
               <button 
                 key={c.id} 
                 onClick={() => setClienteSelecionado(c)} 
-                className={`w-full text-left p-4 rounded-xl text-sm font-bold border transition-all ${clienteSelecionado?.id === c.id ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-50 text-gray-900 hover:border-gray-400'}`}
+                className={`w-full text-left p-4 rounded-xl text-sm font-bold border transition-all flex justify-between items-center ${clienteSelecionado?.id === c.id ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-50 text-gray-900 hover:border-gray-400'}`}
               >
-                {c.nome} {c.sobrenome}
+                <span>{c.nome} {c.sobrenome}</span>
+                {/* NOVO: Mostrando o telefone na lista */}
+                <span className={`text-[10px] font-medium ${clienteSelecionado?.id === c.id ? 'text-blue-200' : 'text-gray-500'}`}>
+                  {c.telefone || 'S/ Tel'}
+                </span>
               </button>
             ))}
           </div>
@@ -195,8 +199,14 @@ export default function Admin() {
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-             <div className="p-4 bg-blue-50 border border-blue-100 rounded-xl text-blue-800 font-black text-sm">
-                {clienteSelecionado ? `${clienteSelecionado.nome} ${clienteSelecionado.sobrenome}` : 'Selecione um cliente ao lado'}
+             <div className="p-4 bg-blue-50 border border-blue-100 rounded-xl text-blue-800 font-black text-sm flex flex-col justify-center">
+                {clienteSelecionado ? (
+                  <>
+                    <span>{clienteSelecionado.nome} {clienteSelecionado.sobrenome}</span>
+                    {/* NOVO: Mostrando o telefone na caixa azul */}
+                    <span className="text-[11px] font-medium text-blue-600 mt-1">{clienteSelecionado.telefone}</span>
+                  </>
+                ) : 'Selecione um cliente ao lado'}
              </div>
              <input 
                type="number" placeholder="Valor Cobrado (R$)" 
@@ -271,12 +281,15 @@ export default function Admin() {
                 <tbody className="divide-y divide-gray-100">
                   {vendasPendentes.map((v) => (
                     <tr key={v.id} className="hover:bg-blue-50/30">
-                      <td className="px-8 py-6 font-bold text-gray-900 text-sm">{v.clientes?.nome} {v.clientes?.sobrenome}</td>
+                      <td className="px-8 py-6">
+                        <div className="font-bold text-gray-900 text-sm">{v.clientes?.nome} {v.clientes?.sobrenome}</div>
+                        {/* NOVO: Mostrando o telefone na tabela de pendentes */}
+                        <div className="text-[10px] text-gray-500 font-medium mt-1">{v.clientes?.telefone || 'S/ Tel'}</div>
+                      </td>
                       <td className="px-8 py-6 text-gray-900 text-xs font-bold italic">{v.produto}</td>
                       <td className="px-8 py-6 font-black text-green-600 text-lg">R$ {v.valor}</td>
                       <td className="px-8 py-6 flex justify-center items-center gap-2">
                         
-                        {/* NOVO BOTÃO DE EDITAR PIX AQUI */}
                         <button 
                           onClick={() => abrirModalPix(v)} 
                           className="bg-blue-50 text-blue-600 px-4 py-2 rounded-xl font-black text-[10px] uppercase hover:bg-blue-100 transition-all flex items-center gap-1.5"
@@ -284,7 +297,6 @@ export default function Admin() {
                           <Edit3 size={14} /> Pix
                         </button>
                         
-                        {/* BOTÃO APROVAR RELIGADO */}
                         <button 
                           onClick={() => aprovarVenda(v.id)} 
                           className="bg-green-100 text-green-700 px-4 py-2 rounded-xl font-black text-[10px] uppercase hover:bg-green-600 hover:text-white transition-all"
