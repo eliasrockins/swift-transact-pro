@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
 
 const videoSlots = [
-  { id: 1, src: "" },
-  { id: 2, src: "" },
-  { id: 3, src: "" },
-  { id: 4, src: "" },
-  { id: 5, src: "" },
+  { id: 1, src: "/videos/depoimento-1.mov", type: "video/mp4" },
+  { id: 2, src: "/videos/depoimento-2.mp4", type: "video/mp4" },
+  { id: 3, src: "/videos/depoimento-3.mp4", type: "video/mp4" },
+  { id: 4, src: "/videos/depoimento-4.mp4", type: "video/mp4" },
+  { id: 5, src: "/videos/depoimento-5.mp4", type: "video/mp4" },
 ];
 
 const TestimonialsSection = () => {
@@ -39,22 +39,14 @@ const TestimonialsSection = () => {
               transition={{ duration: 0.5, delay: index * 0.1 }}
               className="rounded-2xl overflow-hidden glow-border bg-card aspect-[9/16]"
             >
-              {slot.src ? (
-                <video
-                  className="w-full h-full object-cover"
-                  controls
-                  playsInline
-                  preload="metadata"
-                >
-                  <source src={slot.src} type="video/mp4" />
-                </video>
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-surface">
-                  <span className="text-muted-foreground text-sm font-heading">
-                    Vídeo {slot.id}
-                  </span>
-                </div>
-              )}
+              <video
+                className="w-full h-full object-cover"
+                controls
+                playsInline
+                preload="metadata"
+              >
+                <source src={slot.src} type={slot.type} />
+              </video>
             </motion.div>
           ))}
         </div>
