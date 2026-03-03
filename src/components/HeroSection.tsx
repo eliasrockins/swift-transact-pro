@@ -1,8 +1,10 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
   return (
     <section id="inicio" className="relative min-h-screen flex items-center overflow-hidden">
       {/* Video Background */}
@@ -58,11 +60,11 @@ const HeroSection = () => {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="flex flex-col sm:flex-row gap-4"
           >
-            <Button size="lg" className="text-base px-8 py-6 gap-2 bg-primary hover:bg-primary/90 text-primary-foreground glow-box">
+            <Button onClick={() => navigate("/sobre-nos")} size="lg" className="text-base px-8 py-6 gap-2 bg-primary hover:bg-primary/90 text-primary-foreground glow-box">
               Saiba Mais
               <ArrowRight className="w-5 h-5" />
             </Button>
-            <Button size="lg" variant="outline" className="text-base px-8 py-6 border-border hover:bg-secondary">
+            <Button onClick={() => navigate("/auth")} size="lg" variant="outline" className="text-base px-8 py-6 border-border hover:bg-secondary">
               Criar Conta
             </Button>
           </motion.div>
