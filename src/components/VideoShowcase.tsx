@@ -1,6 +1,10 @@
 import { motion } from "framer-motion";
 
-const VideoShowcase = () => {
+interface VideoShowcaseProps {
+  videoSrc?: string;
+}
+
+const VideoShowcase = ({ videoSrc = "/videos/ck-solucoes.mp4" }: VideoShowcaseProps) => {
   return (
     <section className="py-20 relative">
       <div className="container mx-auto px-6">
@@ -18,7 +22,8 @@ const VideoShowcase = () => {
             muted
             playsInline
           >
-            <source src="/videos/ck-solucoes.mp4" type="video/mp4" />
+            <source src={videoSrc} type="video/mp4" />
+            <source src={videoSrc} type="video/quicktime" />
           </video>
         </motion.div>
       </div>
