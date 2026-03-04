@@ -16,12 +16,12 @@ export default function Dashboard() {
   const [pedidos, setPedidos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [abaAtiva, setAbaAtiva] = useState('inicio');
-  const [isReembolsoOpen, setIsReembolsoOpen] = useState(false); // RESTAURADO
+  const [isReembolsoOpen, setIsReembolsoOpen] = useState(false);
   const [copiou, setCopiou] = useState<string | null>(null);
   const [pagamentoAberto, setPagamentoAberto] = useState<any>(null);
   
-  // ESTADO DO CRONÔMETRO (3 horas = 10800 segundos)
-  const [segundosRestantes, setSegundosRestantes] = useState(10800);
+  // ESTADO DO CRONÔMETRO ALTERADO (20 minutos = 1200 segundos)
+  const [segundosRestantes, setSegundosRestantes] = useState(1200);
   
   const navigate = useNavigate();
 
@@ -37,7 +37,7 @@ export default function Dashboard() {
     carregarDados();
   }, [user]);
 
-  // LÓGICA DO CRONÔMETRO ATIVO
+  // LÓGICA DO CRONÔMETRO
   useEffect(() => {
     let intervalo: any;
     if (pagamentoAberto) {
@@ -45,17 +45,17 @@ export default function Dashboard() {
         setSegundosRestantes((prev) => (prev > 0 ? prev - 1 : 0));
       }, 1000);
     } else {
-      setSegundosRestantes(10800); // Reseta para 3h quando fecha
+      // Quando fechar o modal, reseta para 20 minutos novamente
+      setSegundosRestantes(1200); 
     }
     return () => clearInterval(intervalo);
   }, [pagamentoAberto]);
 
-  // FORMATAÇÃO DE SEGUNDOS PARA HH:MM:SS
+  // FORMATAÇÃO DE SEGUNDOS PARA MM:SS (Como é menos de 1h, tirei as horas)
   const formatarTempo = (totalSegundos: number) => {
-    const h = Math.floor(totalSegundos / 3600);
-    const m = Math.floor((totalSegundos % 3600) / 60);
+    const m = Math.floor(totalSegundos / 60);
     const s = totalSegundos % 60;
-    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
   const handleLogout = async () => { await signOut(); navigate('/auth'); };
@@ -78,7 +78,6 @@ export default function Dashboard() {
 
   return (
     <div className="flex min-h-screen bg-[#f8f9fa] font-sans relative">
-      {/* SIDEBAR DESKTOP */}
       <aside className="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col">
         <div className="p-6 border-b border-gray-100 flex items-center gap-3">
           <img src={logo} alt="Ck Soluções" className="w-10 h-10 object-contain" />
@@ -97,7 +96,6 @@ export default function Dashboard() {
       </aside>
 
       <main className="flex-1 p-4 md:p-8 overflow-y-auto pb-24 md:pb-8 relative">
-        {/* HEADER MOBILE RESTAURADO */}
         <div className="md:hidden flex justify-between items-center mb-8 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
           <img src={logo} alt="Ck Soluções" className="h-10 w-auto object-contain" />
           <button onClick={handleLogout} className="flex items-center gap-2 bg-red-50 text-red-500 px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-widest active:scale-95 transition-all">
@@ -110,7 +108,6 @@ export default function Dashboard() {
           <p className="text-gray-500 font-medium">Gerencie seus pedidos e taxas com a CK.</p>
         </header>
 
-        {/* BANNER PRINCIPAL */}
         <div className="bg-gradient-to-r from-[#16123a] to-[#2d2252] rounded-3xl p-8 mb-8 flex flex-col md:flex-row items-center justify-between relative overflow-hidden shadow-xl">
           <div className="z-10 max-w-2xl text-white">
             <h2 className="text-xl md:text-2xl font-black mb-3 leading-snug">
@@ -123,7 +120,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* BOTÕES RESTAURADOS */}
         {abaAtiva === 'inicio' && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <ActionCard icon={<RefreshCcw className="text-blue-500" />} title="Solicitar Reembolso" color="bg-blue-50" onClick={() => setIsReembolsoOpen(true)} />
@@ -132,7 +128,6 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* LISTA DE PEDIDOS */}
         {abaAtiva === 'pedidos' && (
           <div className="space-y-6">
             <h3 className="text-2xl font-black text-gray-900 mb-6">Histórico de Pedidos</h3>
@@ -161,7 +156,6 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* ABA DADOS COM TEXTO PRETO */}
         {abaAtiva === 'dados' && (
           <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
             <h3 className="font-black text-gray-900 mb-8 border-b pb-4">Dados de Cadastro</h3>
@@ -177,7 +171,6 @@ export default function Dashboard() {
         )}
       </main>
 
-      {/* MENU MOBILE RESTAURADO */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-gray-200 flex justify-around p-2 z-40 pb-safe">
         <button onClick={() => setAbaAtiva('inicio')} className={`flex flex-col items-center gap-1 p-2 w-full transition-all ${abaAtiva === 'inicio' ? 'text-blue-600 scale-110' : 'text-gray-400'}`}>
           <LayoutDashboard size={22} /><span className="text-[10px] font-bold">Início</span>
@@ -190,7 +183,6 @@ export default function Dashboard() {
         </button>
       </nav>
 
-      {/* MODAL DE PAGAMENTO COM CRONÔMETRO VIVO */}
       {pagamentoAberto && (
         <div className="fixed inset-0 bg-gray-50/95 backdrop-blur-md z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-[32px] w-full max-w-md p-8 shadow-2xl border border-gray-100 animate-in zoom-in duration-200">
@@ -218,15 +210,14 @@ export default function Dashboard() {
               {copiou === pagamentoAberto.id ? 'CÓDIGO COPIADO!' : 'COPIAR CÓDIGO PIX'}
             </button>
 
-            {/* CRONÔMETRO VIVO */}
-            <div className="mt-6 py-4 bg-red-50 rounded-2xl flex justify-center items-center text-red-600 font-mono font-black border border-red-100 animate-pulse">
-              <Clock size={20} className="mr-3" /> EXPIRA EM: {formatarTempo(segundosRestantes)}
+            {/* CRONÔMETRO VIVO - FORMATADO PARA MM:SS */}
+            <div className="mt-6 py-4 bg-red-50 rounded-2xl flex justify-center items-center text-red-600 font-mono font-black border border-red-100 animate-pulse text-xl tracking-wider">
+              <Clock size={20} className="mr-3" /> {formatarTempo(segundosRestantes)}
             </div>
           </div>
         </div>
       )}
 
-      {/* MODAL DE REEMBOLSO RESTAURADO */}
       {isReembolsoOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl w-full max-w-md p-8 relative shadow-2xl animate-in zoom-in duration-200">
@@ -247,7 +238,6 @@ export default function Dashboard() {
   );
 }
 
-// COMPONENTES AUXILIARES RESTAURADOS
 function NavButton({ icon, label, active, onClick }: any) { return ( <button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${active ? 'bg-blue-50 text-blue-700' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}> {icon} <span className="text-sm">{label}</span> </button> ); }
 function ActionCard({ icon, title, color, onClick }: any) { return ( <div onClick={onClick} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between group cursor-pointer hover:shadow-md hover:border-blue-100 transition-all"> <div className="flex items-center gap-4"> <div className={`p-4 rounded-xl ${color}`}>{icon}</div> <span className="font-black text-gray-900 text-sm">{title}</span> </div> <ChevronRight size={20} className="text-gray-300 group-hover:text-blue-500 transform group-hover:translate-x-1 transition-all" /> </div> ); }
 function DataRow({ label, value }: any) { return ( <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100"> <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">{label}</p> <p className="text-gray-900 font-black text-sm">{value || 'Não informado'}</p> </div> ); }
