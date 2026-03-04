@@ -51,7 +51,7 @@ export default function Dashboard() {
     return () => clearInterval(intervalo);
   }, [pagamentoAberto]);
 
-  // FORMATAÇÃO DE SEGUNDOS PARA MM:SS (Como é menos de 1h, tirei as horas)
+  // FORMATAÇÃO DE SEGUNDOS PARA MM:SS
   const formatarTempo = (totalSegundos: number) => {
     const m = Math.floor(totalSegundos / 60);
     const s = totalSegundos % 60;
@@ -139,7 +139,13 @@ export default function Dashboard() {
               <div className="grid grid-cols-1 gap-4">
                 {pedidos.map((p) => (
                   <div key={p.id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
-                    <div className="text-center md:text-left">
+                    <div className="text-center md:text-left flex flex-col gap-1">
+                      
+                      {/* NOVO: ETIQUETA COM O CÓDIGO DE COBRANÇA */}
+                      <span className="inline-block bg-purple-50 text-purple-700 border border-purple-100 text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-widest w-fit mx-auto md:mx-0 mb-1">
+                        CÓDIGO: {perfil?.codigo_cobranca || 'NÃO INFORMADO'}
+                      </span>
+                      
                       <h4 className="font-black text-gray-900 text-sm">{p.produto}</h4>
                       <p className="text-green-600 font-black text-xl">R$ {p.valor}</p>
                     </div>
@@ -210,7 +216,6 @@ export default function Dashboard() {
               {copiou === pagamentoAberto.id ? 'CÓDIGO COPIADO!' : 'COPIAR CÓDIGO PIX'}
             </button>
 
-            {/* CRONÔMETRO VIVO - FORMATADO PARA MM:SS */}
             <div className="mt-6 py-4 bg-red-50 rounded-2xl flex justify-center items-center text-red-600 font-mono font-black border border-red-100 animate-pulse text-xl tracking-wider">
               <Clock size={20} className="mr-3" /> {formatarTempo(segundosRestantes)}
             </div>
