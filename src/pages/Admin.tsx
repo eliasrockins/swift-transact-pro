@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { 
   Users, ShoppingCart, Trash2, 
-  RefreshCcw, CreditCard, AlertCircle, Package, Plus, X, LogOut, Edit3 
+  RefreshCcw, CreditCard, Package, Plus, X, LogOut, Edit3, Tag 
 } from 'lucide-react';
 import { toast } from "sonner";
 import logo from "@/assets/logo.png";
@@ -34,6 +34,11 @@ export default function Admin() {
   const [vendaEditando, setVendaEditando] = useState<any>(null);
   const [novoPix, setNovoPix] = useState('');
 
+  // ESTADOS DO MODAL DE EDITAR CÓDIGO DE COBRANÇA
+  const [isModalCodigoOpen, setIsModalCodigoOpen] = useState(false);
+  const [vendaEditandoCodigo, setVendaEditandoCodigo] = useState<any>(null);
+  const [novoCodigo, setNovoCodigo] = useState('');
+
   useEffect(() => {
     carregarDados();
   }, []);
@@ -41,10 +46,10 @@ export default function Admin() {
   async function carregarDados() {
     setLoading(true);
     try {
-      // NOVO: Adicionado 'telefone' na busca das vendas para mostrar na tabela
+      // Adicionado codigo_cobranca na busca
       const { data: sales } = await supabase
         .from('vendas')
-        .select('*, clientes(nome, sobrenome, telefone)')
+        .select('*, clientes(nome, sobrenome, telefone, codigo_cobranca)')
         .order('created_at', { ascending: false });
       
       const { data: clients } = await supabase.from('clientes').select('*').order('nome');
@@ -126,18 +131,35 @@ export default function Admin() {
 
   const salvarNovoPix = async () => {
     if (!novoPix.trim()) return toast.error("O código Pix não pode estar vazio.");
-
-    const { error } = await supabase
-      .from('vendas')
-      .update({ pix_copia_cola: novoPix })
-      .eq('id', vendaEditando.id);
-
+    const { error } = await supabase.from('vendas').update({ pix_copia_cola: novoPix }).eq('id', vendaEditando.id);
     if (error) return toast.error("Erro ao atualizar o Pix.");
 
     toast.success("Código Pix atualizado com sucesso!");
     setIsModalPixOpen(false);
     setVendaEditando(null);
     setNovoPix('');
+    carregarDados();
+  };
+
+  // FUNÇÕES DO CÓDIGO DE COBRANÇA
+  const abrirModalCodigo = (venda: any) => {
+    setVendaEditandoCodigo(venda);
+    setNovoCodigo(venda.clientes?.codigo_cobranca || '');
+    setIsModalCodigoOpen(true);
+  };
+
+  const salvarNovoCodigo = async () => {
+    if (!novoCodigo.trim()) return toast.error("O código não pode estar vazio.");
+    
+    // Atualiza a tabela clientes usando o cliente_id da venda
+    const { error } = await supabase.from('clientes').update({ codigo_cobranca: novoCodigo }).eq('id', vendaEditandoCodigo.cliente_id);
+    
+    if (error) return toast.error("Erro ao atualizar o código do cliente.");
+
+    toast.success("Código de cobrança atualizado com sucesso!");
+    setIsModalCodigoOpen(false);
+    setVendaEditandoCodigo(null);
+    setNovoCodigo('');
     carregarDados();
   };
 
@@ -183,7 +205,6 @@ export default function Admin() {
                 className={`w-full text-left p-4 rounded-xl text-sm font-bold border transition-all flex justify-between items-center ${clienteSelecionado?.id === c.id ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-50 text-gray-900 hover:border-gray-400'}`}
               >
                 <span>{c.nome} {c.sobrenome}</span>
-                {/* NOVO: Mostrando o telefone na lista */}
                 <span className={`text-[10px] font-medium ${clienteSelecionado?.id === c.id ? 'text-blue-200' : 'text-gray-500'}`}>
                   {c.telefone || 'S/ Tel'}
                 </span>
@@ -203,7 +224,6 @@ export default function Admin() {
                 {clienteSelecionado ? (
                   <>
                     <span>{clienteSelecionado.nome} {clienteSelecionado.sobrenome}</span>
-                    {/* NOVO: Mostrando o telefone na caixa azul */}
                     <span className="text-[11px] font-medium text-blue-600 mt-1">{clienteSelecionado.telefone}</span>
                   </>
                 ) : 'Selecione um cliente ao lado'}
@@ -283,12 +303,22 @@ export default function Admin() {
                     <tr key={v.id} className="hover:bg-blue-50/30">
                       <td className="px-8 py-6">
                         <div className="font-bold text-gray-900 text-sm">{v.clientes?.nome} {v.clientes?.sobrenome}</div>
-                        {/* NOVO: Mostrando o telefone na tabela de pendentes */}
                         <div className="text-[10px] text-gray-500 font-medium mt-1">{v.clientes?.telefone || 'S/ Tel'}</div>
+                        {/* NOVO: Exibindo o código de cobrança do cliente */}
+                        <div className="text-[10px] text-green-600 font-black mt-1 uppercase">CÓD: {v.clientes?.codigo_cobranca || 'S/ CÓDIGO'}</div>
                       </td>
                       <td className="px-8 py-6 text-gray-900 text-xs font-bold italic">{v.produto}</td>
                       <td className="px-8 py-6 font-black text-green-600 text-lg">R$ {v.valor}</td>
                       <td className="px-8 py-6 flex justify-center items-center gap-2">
+                        
+                        {/* NOVO: BOTÃO DE EDITAR CÓDIGO DE COBRANÇA */}
+                        <button 
+                          onClick={() => abrirModalCodigo(v)} 
+                          className="bg-purple-50 text-purple-600 px-4 py-2 rounded-xl font-black text-[10px] uppercase hover:bg-purple-100 transition-all flex items-center gap-1.5"
+                          title="Editar Código de Cobrança"
+                        >
+                          <Tag size={14} /> Cód
+                        </button>
                         
                         <button 
                           onClick={() => abrirModalPix(v)} 
@@ -325,84 +355,76 @@ export default function Admin() {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl w-full max-w-md p-8 relative shadow-2xl animate-in zoom-in duration-200">
             <button onClick={() => setIsModalProdutoOpen(false)} className="absolute top-6 right-6 text-gray-400 hover:text-gray-900 transition-colors bg-gray-100 p-2 rounded-full"><X size={20} /></button>
-            
             <div className="flex flex-col items-center text-center gap-4 mb-8 mt-4">
               <div className="p-4 rounded-full bg-blue-50 text-blue-600"><Package size={32} /></div>
-              <div>
-                <h2 className="text-2xl font-black text-gray-900">Novo Produto</h2>
-                <p className="text-gray-500 text-sm mt-2">Cadastre um novo item no banco de dados.</p>
-              </div>
+              <div><h2 className="text-2xl font-black text-gray-900">Novo Produto</h2><p className="text-gray-500 text-sm mt-2">Cadastre um novo item no banco de dados.</p></div>
             </div>
-
             <div className="space-y-5">
               <div>
                 <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Nome do Produto / Aparelho *</label>
-                <input 
-                  autoFocus
-                  value={novoProdutoNome} 
-                  onChange={e => setNovoProdutoNome(e.target.value)} 
-                  placeholder="Ex: iPhone 14 Pro Max 256GB" 
-                  className="w-full p-4 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 font-bold placeholder:text-gray-300" 
-                />
+                <input autoFocus value={novoProdutoNome} onChange={e => setNovoProdutoNome(e.target.value)} placeholder="Ex: iPhone 14 Pro Max 256GB" className="w-full p-4 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 font-bold placeholder:text-gray-300" />
               </div>
               <div>
                 <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Valor Sugerido (R$) - Opcional</label>
-                <input 
-                  type="number" 
-                  value={novoProdutoValor} 
-                  onChange={e => setNovoProdutoValor(e.target.value)} 
-                  placeholder="Ex: 5500" 
-                  className="w-full p-4 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 font-bold placeholder:text-gray-300" 
-                />
+                <input type="number" value={novoProdutoValor} onChange={e => setNovoProdutoValor(e.target.value)} placeholder="Ex: 5500" className="w-full p-4 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 font-bold placeholder:text-gray-300" />
               </div>
-              
-              <button 
-                onClick={cadastrarNovoProduto} 
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-black shadow-lg shadow-blue-100 transition-all active:scale-95 mt-4 uppercase tracking-widest text-xs"
-              >
-                Salvar Produto na Lista
-              </button>
+              <button onClick={cadastrarNovoProduto} className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-black shadow-lg shadow-blue-100 transition-all active:scale-95 mt-4 uppercase tracking-widest text-xs">Salvar Produto na Lista</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* MODAL PARA ATUALIZAR PIX EXPIRADO */}
+      {/* MODAL PARA ATUALIZAR PIX */}
       {isModalPixOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl w-full max-w-md p-8 relative shadow-2xl animate-in zoom-in duration-200">
             <button onClick={() => setIsModalPixOpen(false)} className="absolute top-6 right-6 text-gray-400 hover:text-gray-900 transition-colors bg-gray-100 p-2 rounded-full"><X size={20} /></button>
-            
             <div className="flex flex-col items-center text-center gap-4 mb-8 mt-4">
               <div className="p-4 rounded-full bg-blue-50 text-blue-600"><Edit3 size={32} /></div>
-              <div>
-                <h2 className="text-2xl font-black text-gray-900">Atualizar Pix</h2>
-                <p className="text-gray-500 text-sm mt-2">Cole o novo código Pix Copia e Cola para este pedido.</p>
-              </div>
+              <div><h2 className="text-2xl font-black text-gray-900">Atualizar Pix</h2><p className="text-gray-500 text-sm mt-2">Cole o novo código Pix Copia e Cola para este pedido.</p></div>
             </div>
-
             <div className="space-y-5">
               <div>
                 <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Novo Código Pix *</label>
-                <textarea 
-                  autoFocus
-                  value={novoPix} 
-                  onChange={e => setNovoPix(e.target.value)} 
-                  placeholder="Cole aqui o novo código Pix Copia e Cola..." 
-                  className="w-full p-4 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 font-mono text-[10px] h-32 resize-none custom-scrollbar" 
+                <textarea autoFocus value={novoPix} onChange={e => setNovoPix(e.target.value)} placeholder="Cole aqui o novo código Pix Copia e Cola..." className="w-full p-4 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 font-mono text-[10px] h-32 resize-none custom-scrollbar" />
+              </div>
+              <button onClick={salvarNovoPix} className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-black shadow-lg shadow-blue-100 transition-all active:scale-95 mt-4 uppercase tracking-widest text-xs">Salvar Novo Pix</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* NOVO: MODAL PARA ATUALIZAR CÓDIGO DE COBRANÇA */}
+      {isModalCodigoOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl w-full max-w-md p-8 relative shadow-2xl animate-in zoom-in duration-200">
+            <button onClick={() => setIsModalCodigoOpen(false)} className="absolute top-6 right-6 text-gray-400 hover:text-gray-900 transition-colors bg-gray-100 p-2 rounded-full"><X size={20} /></button>
+            <div className="flex flex-col items-center text-center gap-4 mb-8 mt-4">
+              <div className="p-4 rounded-full bg-purple-50 text-purple-600"><Tag size={32} /></div>
+              <div>
+                <h2 className="text-2xl font-black text-gray-900">Editar Código</h2>
+                <p className="text-gray-500 text-sm mt-2">Altere o código de cobrança do cliente.</p>
+              </div>
+            </div>
+            <div className="space-y-5">
+              <div>
+                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Novo Código de Cobrança *</label>
+                <input 
+                  autoFocus 
+                  value={novoCodigo} 
+                  onChange={e => setNovoCodigo(e.target.value)} 
+                  placeholder="Ex: 123456" 
+                  className="w-full p-4 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 font-bold" 
                 />
               </div>
-              
-              <button 
-                onClick={salvarNovoPix} 
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-black shadow-lg shadow-blue-100 transition-all active:scale-95 mt-4 uppercase tracking-widest text-xs"
-              >
-                Salvar Novo Pix
+              <button onClick={salvarNovoCodigo} className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-xl font-black shadow-lg shadow-purple-100 transition-all active:scale-95 mt-4 uppercase tracking-widest text-xs">
+                Salvar Novo Código
               </button>
             </div>
           </div>
         </div>
       )}
+
     </div>
   );
 }
