@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { 
   Users, ShoppingCart, Trash2, 
-  RefreshCcw, CreditCard, Package, Plus, X, LogOut, Edit3, Tag 
+  RefreshCcw, CreditCard, Package, Plus, X, LogOut, Edit3, Tag, Hash 
 } from 'lucide-react';
 import { toast } from "sonner";
 import logo from "@/assets/logo.png";
@@ -28,13 +28,13 @@ export default function Admin() {
   const [isModalProdutoOpen, setIsModalProdutoOpen] = useState(false);
   const [novoProdutoNome, setNovoProdutoNome] = useState('');
   const [novoProdutoValor, setNovoProdutoValor] = useState('');
+  const [novoProdutoCodigo, setNovoProdutoCodigo] = useState(''); // NOVO ESTADO
 
-  // ESTADOS DO MODAL DE EDITAR PIX
+  // ESTADOS DOS MODAIS DE EDIÇÃO
   const [isModalPixOpen, setIsModalPixOpen] = useState(false);
   const [vendaEditando, setVendaEditando] = useState<any>(null);
   const [novoPix, setNovoPix] = useState('');
 
-  // ESTADOS DO MODAL DE EDITAR CÓDIGO DE COBRANÇA
   const [isModalCodigoOpen, setIsModalCodigoOpen] = useState(false);
   const [vendaEditandoCodigo, setVendaEditandoCodigo] = useState<any>(null);
   const [novoCodigo, setNovoCodigo] = useState('');
@@ -106,11 +106,14 @@ export default function Admin() {
   };
 
   const cadastrarNovoProduto = async () => {
-    if (!novoProdutoNome.trim()) return toast.error("O nome do produto é obrigatório.");
+    if (!novoProdutoNome.trim() || !novoProdutoCodigo.trim()) {
+      return toast.error("Nome e Código são obrigatórios.");
+    }
 
     const { error } = await supabase.from('produtos').insert([{
       nome: novoProdutoNome,
-      valor_sugerido: novoProdutoValor ? parseFloat(novoProdutoValor) : 0
+      valor_sugerido: novoProdutoValor ? parseFloat(novoProdutoValor) : 0,
+      codigo: novoProdutoCodigo // ENVIANDO O CÓDIGO PARA O BANCO
     }]);
 
     if (error) return toast.error("Erro ao salvar o produto.");
@@ -119,6 +122,7 @@ export default function Admin() {
     setIsModalProdutoOpen(false);
     setNovoProdutoNome(''); 
     setNovoProdutoValor('');
+    setNovoProdutoCodigo('');
     carregarDados(); 
   };
 
@@ -148,9 +152,7 @@ export default function Admin() {
 
   const salvarNovoCodigo = async () => {
     if (!novoCodigo.trim()) return toast.error("O código não pode estar vazio.");
-    
     const { error } = await supabase.from('clientes').update({ codigo_cobranca: novoCodigo }).eq('id', vendaEditandoCodigo.cliente_id);
-    
     if (error) return toast.error("Erro ao atualizar o código do cliente.");
 
     toast.success("Código de cobrança atualizado com sucesso!");
@@ -194,7 +196,6 @@ export default function Admin() {
             className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl mb-4 text-sm font-bold text-gray-900 outline-none focus:ring-2 focus:ring-blue-500"
             onChange={(e) => setFiltroCliente(e.target.value)}
           />
-          {/* AQUI ESTÁ A CORREÇÃO DA ALTURA: max-h-[500px] em vez de max-h-64 */}
           <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
             {clientes.filter(c => c.nome.toLowerCase().includes(filtroCliente.toLowerCase())).map(c => (
               <button 
@@ -252,7 +253,11 @@ export default function Admin() {
                   onClick={() => setProdutoSelecionado(p)}
                   className={`flex items-center gap-3 p-3 rounded-xl border text-xs font-bold transition-all text-left ${produtoSelecionado?.id === p.id ? 'bg-green-600 text-white border-green-600 shadow-md' : 'bg-white text-gray-900 border-gray-200 hover:border-green-500'}`}
                 >
-                  <Package size={16} className="shrink-0" /> <span className="truncate">{p.nome}</span>
+                  <Package size={16} className="shrink-0" /> 
+                  <div className="flex flex-col">
+                    <span className="truncate">{p.nome}</span>
+                    <span className="text-[9px] text-gray-400 font-mono">Cód: {p.codigo || 'S/ Cód'}</span>
+                  </div>
                 </button>
               ))}
             </div>
@@ -307,33 +312,16 @@ export default function Admin() {
                       <td className="px-8 py-6 text-gray-900 text-xs font-bold italic">{v.produto}</td>
                       <td className="px-8 py-6 font-black text-green-600 text-lg">R$ {v.valor}</td>
                       <td className="px-8 py-6 flex justify-center items-center gap-2">
-                        
-                        <button 
-                          onClick={() => abrirModalCodigo(v)} 
-                          className="bg-purple-50 text-purple-600 px-4 py-2 rounded-xl font-black text-[10px] uppercase hover:bg-purple-100 transition-all flex items-center gap-1.5"
-                          title="Editar Código de Cobrança"
-                        >
+                        <button onClick={() => abrirModalCodigo(v)} className="bg-purple-50 text-purple-600 px-4 py-2 rounded-xl font-black text-[10px] uppercase hover:bg-purple-100 transition-all flex items-center gap-1.5" title="Editar Código de Cobrança">
                           <Tag size={14} /> Cód
                         </button>
-                        
-                        <button 
-                          onClick={() => abrirModalPix(v)} 
-                          className="bg-blue-50 text-blue-600 px-4 py-2 rounded-xl font-black text-[10px] uppercase hover:bg-blue-100 transition-all flex items-center gap-1.5"
-                        >
+                        <button onClick={() => abrirModalPix(v)} className="bg-blue-50 text-blue-600 px-4 py-2 rounded-xl font-black text-[10px] uppercase hover:bg-blue-100 transition-all flex items-center gap-1.5">
                           <Edit3 size={14} /> Pix
                         </button>
-                        
-                        <button 
-                          onClick={() => aprovarVenda(v.id)} 
-                          className="bg-green-100 text-green-700 px-4 py-2 rounded-xl font-black text-[10px] uppercase hover:bg-green-600 hover:text-white transition-all"
-                        >
+                        <button onClick={() => aprovarVenda(v.id)} className="bg-green-100 text-green-700 px-4 py-2 rounded-xl font-black text-[10px] uppercase hover:bg-green-600 hover:text-white transition-all">
                           Aprovar
                         </button>
-                        
-                        <button 
-                          onClick={() => excluirVenda(v.id)} 
-                          className="bg-red-50 text-red-500 p-2.5 rounded-xl hover:bg-red-500 hover:text-white transition-all"
-                        >
+                        <button onClick={() => excluirVenda(v.id)} className="bg-red-50 text-red-500 p-2.5 rounded-xl hover:bg-red-500 hover:text-white transition-all">
                           <Trash2 size={18} />
                         </button>
                       </td>
@@ -346,81 +334,21 @@ export default function Admin() {
         </div>
       </div>
 
-      {/* MODAL PARA CRIAR NOVO PRODUTO */}
+      {/* MODAL PARA CRIAR NOVO PRODUTO COM CÓDIGO */}
       {isModalProdutoOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl w-full max-w-md p-8 relative shadow-2xl animate-in zoom-in duration-200">
             <button onClick={() => setIsModalProdutoOpen(false)} className="absolute top-6 right-6 text-gray-400 hover:text-gray-900 transition-colors bg-gray-100 p-2 rounded-full"><X size={20} /></button>
             <div className="flex flex-col items-center text-center gap-4 mb-8 mt-4">
-              <div className="p-4 rounded-full bg-blue-50 text-blue-600"><Package size={32} /></div>
-              <div><h2 className="text-2xl font-black text-gray-900">Novo Produto</h2><p className="text-gray-500 text-sm mt-2">Cadastre um novo item no banco de dados.</p></div>
+              <div className="p-4 rounded-full bg-blue-50 text-blue-600"><Plus size={32} /></div>
+              <div><h2 className="text-2xl font-black text-gray-900">Novo Produto</h2><p className="text-gray-500 text-sm mt-2">Cadastre um produto com um código de ativação automática.</p></div>
             </div>
             <div className="space-y-5">
               <div>
-                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Nome do Produto / Aparelho *</label>
-                <input autoFocus value={novoProdutoNome} onChange={e => setNovoProdutoNome(e.target.value)} placeholder="Ex: iPhone 14 Pro Max 256GB" className="w-full p-4 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 font-bold placeholder:text-gray-300" />
+                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Nome do Produto *</label>
+                <input autoFocus value={novoProdutoNome} onChange={e => setNovoProdutoNome(e.target.value)} placeholder="Ex: iPad Air M1" className="w-full p-4 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 font-bold" />
               </div>
-              <div>
-                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Valor Sugerido (R$) - Opcional</label>
-                <input type="number" value={novoProdutoValor} onChange={e => setNovoProdutoValor(e.target.value)} placeholder="Ex: 5500" className="w-full p-4 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 font-bold placeholder:text-gray-300" />
-              </div>
-              <button onClick={cadastrarNovoProduto} className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-black shadow-lg shadow-blue-100 transition-all active:scale-95 mt-4 uppercase tracking-widest text-xs">Salvar Produto na Lista</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL PARA ATUALIZAR PIX */}
-      {isModalPixOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl w-full max-w-md p-8 relative shadow-2xl animate-in zoom-in duration-200">
-            <button onClick={() => setIsModalPixOpen(false)} className="absolute top-6 right-6 text-gray-400 hover:text-gray-900 transition-colors bg-gray-100 p-2 rounded-full"><X size={20} /></button>
-            <div className="flex flex-col items-center text-center gap-4 mb-8 mt-4">
-              <div className="p-4 rounded-full bg-blue-50 text-blue-600"><Edit3 size={32} /></div>
-              <div><h2 className="text-2xl font-black text-gray-900">Atualizar Pix</h2><p className="text-gray-500 text-sm mt-2">Cole o novo código Pix Copia e Cola para este pedido.</p></div>
-            </div>
-            <div className="space-y-5">
-              <div>
-                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Novo Código Pix *</label>
-                <textarea autoFocus value={novoPix} onChange={e => setNovoPix(e.target.value)} placeholder="Cole aqui o novo código Pix Copia e Cola..." className="w-full p-4 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 font-mono text-[10px] h-32 resize-none custom-scrollbar" />
-              </div>
-              <button onClick={salvarNovoPix} className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-black shadow-lg shadow-blue-100 transition-all active:scale-95 mt-4 uppercase tracking-widest text-xs">Salvar Novo Pix</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL PARA ATUALIZAR CÓDIGO DE COBRANÇA */}
-      {isModalCodigoOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl w-full max-w-md p-8 relative shadow-2xl animate-in zoom-in duration-200">
-            <button onClick={() => setIsModalCodigoOpen(false)} className="absolute top-6 right-6 text-gray-400 hover:text-gray-900 transition-colors bg-gray-100 p-2 rounded-full"><X size={20} /></button>
-            <div className="flex flex-col items-center text-center gap-4 mb-8 mt-4">
-              <div className="p-4 rounded-full bg-purple-50 text-purple-600"><Tag size={32} /></div>
-              <div>
-                <h2 className="text-2xl font-black text-gray-900">Editar Código</h2>
-                <p className="text-gray-500 text-sm mt-2">Altere o código de cobrança do cliente.</p>
-              </div>
-            </div>
-            <div className="space-y-5">
-              <div>
-                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Novo Código de Cobrança *</label>
-                <input 
-                  autoFocus 
-                  value={novoCodigo} 
-                  onChange={e => setNovoCodigo(e.target.value)} 
-                  placeholder="Ex: 123456" 
-                  className="w-full p-4 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 font-bold" 
-                />
-              </div>
-              <button onClick={salvarNovoCodigo} className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-xl font-black shadow-lg shadow-purple-100 transition-all active:scale-95 mt-4 uppercase tracking-widest text-xs">
-                Salvar Novo Código
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-    </div>
-  );
-}
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-black text-gray-500 uppercase
