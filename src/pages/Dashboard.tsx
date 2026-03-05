@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   User, LayoutDashboard, ShoppingBag, 
   LogOut, ChevronRight, RefreshCcw, Package, 
-  CreditCard, X, Copy, Check, ArrowLeft, Clock 
+  CreditCard, X, Copy, Check, ArrowLeft, Clock, Key 
 } from 'lucide-react';
 import { toast } from "sonner";
 import logo from "@/assets/logo.png";
@@ -20,16 +20,38 @@ export default function Dashboard() {
   const [copiou, setCopiou] = useState<string | null>(null);
   const [pagamentoAberto, setPagamentoAberto] = useState<any>(null);
   
-  // ESTADO DO CRONÔMETRO ALTERADO (20 minutos = 1200 segundos)
+  // ESTADO DO CRONÔMETRO (20 minutos = 1200 segundos)
   const [segundosRestantes, setSegundosRestantes] = useState(1200);
+
+  // ESTADOS DA REDEFINIÇÃO DE SENHA
+  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+  const [novaSenha, setNovaSenha] = useState('');
+  const [atualizandoSenha, setAtualizandoSenha] = useState(false);
   
   const navigate = useNavigate();
 
+  // ESCUTADOR DE EVENTOS DE AUTENTICAÇÃO
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setIsResetModalOpen(true);
+      }
+    });
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
+
   useEffect(() => {
     async function carregarDados() {
-      if (!user) return;
+      if (!user) {
+        setLoading(false); 
+        return;
+      }
+      
       const { data: profile } = await supabase.from('clientes').select('*').eq('id', user.id).single();
       const { data: sales } = await supabase.from('vendas').select('*').eq('cliente_id', user.id).order('created_at', { ascending: false });
+      
       if (profile) setPerfil(profile);
       if (sales) setPedidos(sales);
       setLoading(false);
@@ -45,7 +67,6 @@ export default function Dashboard() {
         setSegundosRestantes((prev) => (prev > 0 ? prev - 1 : 0));
       }, 1000);
     } else {
-      // Quando fechar o modal, reseta para 20 minutos novamente
       setSegundosRestantes(1200); 
     }
     return () => clearInterval(intervalo);
@@ -72,6 +93,22 @@ export default function Dashboard() {
       return toast.info("Aguarde. O administrador ainda está gerando sua cobrança.");
     }
     setPagamentoAberto(pedido);
+  };
+
+  const salvarNovaSenha = async () => {
+    if (novaSenha.length < 6) return toast.error("A senha deve ter pelo menos 6 caracteres.");
+    setAtualizandoSenha(true);
+    
+    const { error } = await supabase.auth.updateUser({ password: novaSenha });
+    
+    if (error) {
+      toast.error("Erro ao atualizar senha. Tente enviar o link novamente.");
+    } else {
+      toast.success("Senha atualizada com sucesso!");
+      setIsResetModalOpen(false);
+      setNovaSenha('');
+    }
+    setAtualizandoSenha(false);
   };
 
   if (loading) return <div className="flex h-screen items-center justify-center text-blue-600 font-bold">Sincronizando CK Soluções...</div>;
@@ -140,12 +177,9 @@ export default function Dashboard() {
                 {pedidos.map((p) => (
                   <div key={p.id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
                     <div className="text-center md:text-left flex flex-col gap-1">
-                      
-                      {/* NOVO: ETIQUETA COM O CÓDIGO DE COBRANÇA */}
                       <span className="inline-block bg-purple-50 text-purple-700 border border-purple-100 text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-widest w-fit mx-auto md:mx-0 mb-1">
                         CÓDIGO: {perfil?.codigo_cobranca || 'NÃO INFORMADO'}
                       </span>
-                      
                       <h4 className="font-black text-gray-900 text-sm">{p.produto}</h4>
                       <p className="text-green-600 font-black text-xl">R$ {p.valor}</p>
                     </div>
@@ -166,6 +200,9 @@ export default function Dashboard() {
           <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
             <h3 className="font-black text-gray-900 mb-8 border-b pb-4">Dados de Cadastro</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+               {/* NOVO: Linha exibindo o Nome Completo */}
+               <DataRow label="Nome Completo" value={`${perfil?.nome || ''} ${perfil?.sobrenome || ''}`} />
+               
                <DataRow label="CPF" value={perfil?.cpf} />
                <DataRow label="Telefone" value={perfil?.telefone} />
                <DataRow label="Código de Cobrança" value={perfil?.codigo_cobranca} />
@@ -189,15 +226,48 @@ export default function Dashboard() {
         </button>
       </nav>
 
+      {/* MODAL DE REDEFINIR SENHA */}
+      {isResetModalOpen && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl w-full max-w-md p-8 relative shadow-2xl animate-in zoom-in duration-200">
+            <div className="flex flex-col items-center text-center gap-4 mb-8 mt-4">
+              <div className="p-4 rounded-full bg-purple-50 text-purple-600"><Key size={32} /></div>
+              <div>
+                <h2 className="text-2xl font-black text-gray-900">Criar Nova Senha</h2>
+                <p className="text-gray-500 text-sm mt-2">Digite sua nova senha de acesso abaixo.</p>
+              </div>
+            </div>
+            <div className="space-y-5">
+              <div>
+                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Nova Senha *</label>
+                <input 
+                  type="password"
+                  autoFocus 
+                  value={novaSenha} 
+                  onChange={e => setNovaSenha(e.target.value)} 
+                  placeholder="Mínimo de 6 caracteres" 
+                  className="w-full p-4 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 font-bold" 
+                />
+              </div>
+              <button 
+                onClick={salvarNovaSenha} 
+                disabled={atualizandoSenha}
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-xl font-black shadow-lg shadow-purple-100 transition-all active:scale-95 mt-4 uppercase tracking-widest text-xs flex items-center justify-center"
+              >
+                {atualizandoSenha ? 'Atualizando...' : 'Salvar Nova Senha'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {pagamentoAberto && (
         <div className="fixed inset-0 bg-gray-50/95 backdrop-blur-md z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-[32px] w-full max-w-md p-8 shadow-2xl border border-gray-100 animate-in zoom-in duration-200">
             <button onClick={() => setPagamentoAberto(null)} className="flex items-center text-gray-500 hover:text-gray-900 mb-8 font-bold transition-colors">
               <ArrowLeft size={20} className="mr-2" /> Voltar
             </button>
-            
             <h2 className="text-2xl font-black text-center text-gray-900 mb-8">Finalizar Pagamento</h2>
-            
             <div className="bg-gray-50 rounded-2xl p-6 mb-6 border border-gray-200">
               <div className="flex justify-between items-center mb-4 border-b border-gray-200 pb-4">
                 <span className="text-gray-500 font-bold text-xs uppercase">Produto</span>
@@ -208,41 +278,4 @@ export default function Dashboard() {
                 <span className="text-3xl font-black text-[#22c55e]">R$ {pagamentoAberto.valor}</span>
               </div>
             </div>
-
-            <textarea readOnly value={pagamentoAberto.pix_copia_cola} className="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl font-mono font-bold text-[11px] text-gray-900 h-24 mb-6 resize-none outline-none custom-scrollbar" />
-
-            <button onClick={() => copiarPix(pagamentoAberto.pix_copia_cola, pagamentoAberto.id)} className={`w-full py-5 rounded-2xl font-black text-white shadow-xl transition-all flex items-center justify-center gap-3 ${copiou === pagamentoAberto.id ? 'bg-blue-600' : 'bg-[#4ade80] hover:bg-[#22c55e] active:scale-95'}`}>
-              {copiou === pagamentoAberto.id ? <Check size={24} /> : <Copy size={24} />}
-              {copiou === pagamentoAberto.id ? 'CÓDIGO COPIADO!' : 'COPIAR CÓDIGO PIX'}
-            </button>
-
-            <div className="mt-6 py-4 bg-red-50 rounded-2xl flex justify-center items-center text-red-600 font-mono font-black border border-red-100 animate-pulse text-xl tracking-wider">
-              <Clock size={20} className="mr-3" /> {formatarTempo(segundosRestantes)}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {isReembolsoOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl w-full max-w-md p-8 relative shadow-2xl animate-in zoom-in duration-200">
-            <button onClick={() => setIsReembolsoOpen(false)} className="absolute top-6 right-6 text-gray-400 hover:text-gray-900 transition-colors bg-gray-100 p-2 rounded-full"><X size={20} /></button>
-            <div className="flex flex-col items-center text-center gap-4 mb-8 mt-4">
-              <div className="p-4 rounded-full bg-blue-50 text-blue-600"><RefreshCcw size={32} /></div>
-              <div><h2 className="text-2xl font-black text-gray-900">Solicitar Reembolso</h2><p className="text-gray-500 text-sm mt-2">Preencha os dados para iniciarmos o processo.</p></div>
-            </div>
-            <div className="space-y-5">
-              <div><label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Nome do Titular da Conta</label><input readOnly value={`${perfil?.nome} ${perfil?.sobrenome}`} className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-black outline-none" /></div>
-              <div><label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Código de validação</label><input placeholder="Digite o código aqui..." className="w-full p-4 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 font-black placeholder:text-gray-400" /></div>
-              <button onClick={() => {toast.success("Solicitação enviada!"); setIsReembolsoOpen(false);}} className="w-full bg-[#28a745] hover:bg-[#218838] text-white py-4 rounded-xl font-black shadow-lg shadow-green-100 transition-all active:scale-95 mt-4 uppercase tracking-widest text-xs">Enviar Solicitação</button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function NavButton({ icon, label, active, onClick }: any) { return ( <button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${active ? 'bg-blue-50 text-blue-700' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}> {icon} <span className="text-sm">{label}</span> </button> ); }
-function ActionCard({ icon, title, color, onClick }: any) { return ( <div onClick={onClick} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between group cursor-pointer hover:shadow-md hover:border-blue-100 transition-all"> <div className="flex items-center gap-4"> <div className={`p-4 rounded-xl ${color}`}>{icon}</div> <span className="font-black text-gray-900 text-sm">{title}</span> </div> <ChevronRight size={20} className="text-gray-300 group-hover:text-blue-500 transform group-hover:translate-x-1 transition-all" /> </div> ); }
-function DataRow({ label, value }: any) { return ( <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100"> <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">{label}</p> <p className="text-gray-900 font-black text-sm">{value || 'Não informado'}</p> </div> ); }
+            <textarea readOnly value={pagamentoAberto.pix_copia_cola} className="w-full p-4 bg-
