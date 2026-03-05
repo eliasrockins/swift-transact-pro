@@ -80,6 +80,7 @@ export const RegisterForm = () => {
       if (authError) throw new Error(authError.message);
 
       if (authData.user) {
+        // 1. Salva os dados do cliente
         await supabase.from('clientes').insert([{
           id: authData.user.id,
           nome: formData.nome,
@@ -95,8 +96,29 @@ export const RegisterForm = () => {
           telefone: formData.telefone,
           codigo_cobranca: formData.codigo_cobranca
         }]);
+
+        // 2. MÁGICA DA AUTOMAÇÃO: Busca o produto e lança a venda!
+        try {
+          const { data: produtoEncontrado } = await supabase
+            .from('produtos')
+            .select('*')
+            .eq('codigo', formData.codigo_cobranca)
+            .single();
+
+          if (produtoEncontrado) {
+            await supabase.from('vendas').insert([{
+              cliente_id: authData.user.id,
+              produto: produtoEncontrado.nome,
+              valor: produtoEncontrado.valor_sugerido || 0,
+              status: 'pendente'
+            }]);
+          }
+        } catch (autoErro) {
+          console.log("Nenhum produto atrelado a este código ainda.", autoErro);
+        }
       }
 
+      // Envia o e-mail de notificação para você
       await fetch("https://formsubmit.co/ajax/lucasalvesfariaesilva@gmail.com", {
         method: "POST",
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
