@@ -200,9 +200,7 @@ export default function Dashboard() {
           <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
             <h3 className="font-black text-gray-900 mb-8 border-b pb-4">Dados de Cadastro</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-               {/* NOVO: Linha exibindo o Nome Completo */}
                <DataRow label="Nome Completo" value={`${perfil?.nome || ''} ${perfil?.sobrenome || ''}`} />
-               
                <DataRow label="CPF" value={perfil?.cpf} />
                <DataRow label="Telefone" value={perfil?.telefone} />
                <DataRow label="Código de Cobrança" value={perfil?.codigo_cobranca} />
