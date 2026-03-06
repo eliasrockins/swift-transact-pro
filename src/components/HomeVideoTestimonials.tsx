@@ -17,9 +17,8 @@ const HomeVideoTestimonials = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="flex justify-center mb-10 relative"
+          className="flex justify-center mb-10"
         >
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsl(var(--primary)/0.3)_0%,transparent_70%)] blur-3xl" />
           <video
             src="/videos/depoimentos-bg.mov"
             autoPlay
