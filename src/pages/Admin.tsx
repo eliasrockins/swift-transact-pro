@@ -51,7 +51,12 @@ export default function Admin() {
         .select('*, clientes(nome, sobrenome, telefone, codigo_cobranca)')
         .order('created_at', { ascending: false });
       
-      const { data: clients } = await supabase.from('clientes').select('*').order('nome');
+      // AQUI ESTÁ A MÁGICA: Ordenando clientes pelo mais recente primeiro!
+      const { data: clients } = await supabase
+        .from('clientes')
+        .select('*')
+        .order('created_at', { ascending: false });
+        
       const { data: products } = await supabase.from('produtos').select('*').order('nome');
 
       setVendas(sales || []);
