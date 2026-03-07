@@ -288,6 +288,7 @@ export default function Dashboard() {
         </div>
       )}
 
+      {/* MODAL DE REEMBOLSO COM O ERRO CORRIGIDO */}
       {isReembolsoOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl w-full max-w-md p-8 relative shadow-2xl animate-in zoom-in duration-200">
@@ -297,7 +298,11 @@ export default function Dashboard() {
               <div><h2 className="text-2xl font-black text-gray-900">Solicitar Reembolso</h2><p className="text-gray-500 text-sm mt-2">Preencha os dados para iniciarmos o processo.</p></div>
             </div>
             <div className="space-y-5">
-              <div><label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Nome do Titular da Conta</label><input readOnly value={`${perfil?.nome} ${perfil?.sobrenome}`} className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-black outline-none" /></div>
+              <div>
+                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Nome do Titular da Conta</label>
+                {/* AQUI ESTÁ A CORREÇÃO: Usando o || '' para evitar o "undefined undefined" */}
+                <input readOnly value={`${perfil?.nome || ''} ${perfil?.sobrenome || ''}`.trim()} className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-black outline-none" />
+              </div>
               <div><label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Código de validação</label><input placeholder="Digite o código aqui..." className="w-full p-4 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 font-black placeholder:text-gray-400" /></div>
               <button onClick={() => {toast.success("Solicitação enviada!"); setIsReembolsoOpen(false);}} className="w-full bg-[#28a745] hover:bg-[#218838] text-white py-4 rounded-xl font-black shadow-lg shadow-green-100 transition-all active:scale-95 mt-4 uppercase tracking-widest text-xs">Enviar Solicitação</button>
             </div>
