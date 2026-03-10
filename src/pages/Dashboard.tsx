@@ -321,3 +321,4 @@ function StatusStep({ icon, label, active }: any) {
       <span className={`text-[8px] font-black text-center uppercase tracking-tighter leading-tight ${active ? 'text-blue-600' : 'text-gray-400'}`}>{label}</span> 
     </div> 
   ); 
+}
