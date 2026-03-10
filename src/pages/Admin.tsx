@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { 
   Users, ShoppingCart, Trash2, 
-  RefreshCcw, CreditCard, Package, Plus, X, LogOut, Edit3, Tag, Hash 
+  RefreshCcw, CreditCard, Package, Plus, X, LogOut, Edit3, Tag, Hash, Clock, Eye
 } from 'lucide-react';
 import { toast } from "sonner";
 import logo from "@/assets/logo.png";
@@ -20,6 +20,7 @@ export default function Admin() {
   const [filtroCliente, setFiltroCliente] = useState('');
 
   const [clienteSelecionado, setClienteSelecionado] = useState<any>(null);
+  const [logsCliente, setLogsCliente] = useState<any[]>([]); // NOVA ESTADO PARA OS LOGS
   const [produtoSelecionado, setProdutoSelecionado] = useState<any>(null); 
   const [valor, setValor] = useState('');
   const [pixCode, setPixCode] = useState('');
@@ -42,6 +43,13 @@ export default function Admin() {
   useEffect(() => {
     carregarDados();
   }, []);
+
+  // EFEITO PARA CARREGAR LOGS SEMPRE QUE MUDAR O CLIENTE
+  useEffect(() => {
+    if (clienteSelecionado) {
+      carregarLogs(clienteSelecionado.id);
+    }
+  }, [clienteSelecionado]);
 
   async function carregarDados() {
     setLoading(true);
@@ -66,6 +74,17 @@ export default function Admin() {
     } finally {
       setLoading(false);
     }
+  }
+
+  async function carregarLogs(clienteId: string) {
+    const { data } = await supabase
+      .from('logs_atividades')
+      .select('*')
+      .eq('cliente_id', clienteId)
+      .order('created_at', { ascending: false })
+      .limit(10);
+    
+    setLogsCliente(data || []);
   }
 
   const handleLogout = async () => {
@@ -222,74 +241,121 @@ export default function Admin() {
           </div>
         </div>
 
-        {/* 2. NOVO PEDIDO */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-          <h2 className="text-xs font-black text-green-600 uppercase mb-6 flex items-center gap-2 tracking-widest">
-            <ShoppingCart size={16}/> 2. Novo Pedido
-          </h2>
+        {/* 2. NOVO PEDIDO E LOGS */}
+        <div className="lg:col-span-2 space-y-8">
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-             <div className="p-4 bg-blue-50 border border-blue-100 rounded-xl text-blue-800 font-black text-sm flex flex-col justify-center">
-                {clienteSelecionado ? (
-                  <>
-                    <span>{clienteSelecionado.nome} {clienteSelecionado.sobrenome}</span>
-                    <span className="text-[11px] font-medium text-blue-600 mt-1">{clienteSelecionado.telefone}</span>
-                  </>
-                ) : 'Selecione um cliente ao lado'}
-             </div>
-             <input 
-               type="number" placeholder="Valor Cobrado (R$)" 
-               className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl text-sm font-black text-gray-900 outline-none focus:ring-2 focus:ring-green-500" 
-               value={valor} 
-               onChange={e => setValor(e.target.value)} 
-             />
-          </div>
-
-          <div className="mb-6">
-            <div className="flex justify-between items-center mb-3 p-2 bg-gray-50 rounded-xl border border-gray-100">
-              <label className="text-[10px] font-black text-gray-500 uppercase ml-2">Selecione o Produto</label>
-              <button 
-                onClick={() => setIsModalProdutoOpen(true)}
-                className="text-[10px] font-black text-white uppercase bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700 transition-all flex items-center gap-2 active:scale-95 shadow-md shadow-blue-200"
-              >
-                <Plus size={14} /> Criar Produto
-              </button>
-            </div>
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <h2 className="text-xs font-black text-green-600 uppercase mb-6 flex items-center gap-2 tracking-widest">
+              <ShoppingCart size={16}/> 2. Novo Pedido
+            </h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-48 overflow-y-auto p-1 custom-scrollbar">
-              {produtosDB.map(p => (
-                <button 
-                  key={p.id}
-                  onClick={() => setProdutoSelecionado(p)}
-                  className={`flex items-center gap-3 p-3 rounded-xl border text-xs font-bold transition-all text-left ${produtoSelecionado?.id === p.id ? 'bg-green-600 text-white border-green-600 shadow-md' : 'bg-white text-gray-900 border-gray-200 hover:border-green-500'}`}
-                >
-                  <Package size={16} className="shrink-0" /> 
-                  <div className="flex flex-col">
-                    <span className="truncate">{p.nome}</span>
-                    <span className="text-[9px] text-gray-400 font-mono">Cód: {p.codigo || 'S/ Cód'}</span>
-                  </div>
-                </button>
-              ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+               <div className="p-4 bg-blue-50 border border-blue-100 rounded-xl text-blue-800 font-black text-sm flex flex-col justify-center">
+                  {clienteSelecionado ? (
+                    <>
+                      <span>{clienteSelecionado.nome} {clienteSelecionado.sobrenome}</span>
+                      <span className="text-[11px] font-medium text-blue-600 mt-1">{clienteSelecionado.telefone}</span>
+                    </>
+                  ) : 'Selecione um cliente ao lado'}
+               </div>
+               <input 
+                 type="number" placeholder="Valor Cobrado (R$)" 
+                 className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl text-sm font-black text-gray-900 outline-none focus:ring-2 focus:ring-green-500" 
+                 value={valor} 
+                 onChange={e => setValor(e.target.value)} 
+               />
             </div>
+
+            <div className="mb-6">
+              <div className="flex justify-between items-center mb-3 p-2 bg-gray-50 rounded-xl border border-gray-100">
+                <label className="text-[10px] font-black text-gray-500 uppercase ml-2">Selecione o Produto</label>
+                <button 
+                  onClick={() => setIsModalProdutoOpen(true)}
+                  className="text-[10px] font-black text-white uppercase bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700 transition-all flex items-center gap-2 active:scale-95 shadow-md shadow-blue-200"
+                >
+                  <Plus size={14} /> Criar Produto
+                </button>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-48 overflow-y-auto p-1 custom-scrollbar">
+                {produtosDB.map(p => (
+                  <button 
+                    key={p.id}
+                    onClick={() => setProdutoSelecionado(p)}
+                    className={`flex items-center gap-3 p-3 rounded-xl border text-xs font-bold transition-all text-left ${produtoSelecionado?.id === p.id ? 'bg-green-600 text-white border-green-600 shadow-md' : 'bg-white text-gray-900 border-gray-200 hover:border-green-500'}`}
+                  >
+                    <Package size={16} className="shrink-0" /> 
+                    <div className="flex flex-col">
+                      <span className="truncate">{p.nome}</span>
+                      <span className="text-[9px] text-gray-400 font-mono">Cód: {p.codigo || 'S/ Cód'}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <textarea 
+              placeholder="Cole aqui o Código Pix..." 
+              className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl mb-6 text-[11px] font-mono font-bold text-gray-900 h-24 resize-none focus:ring-2 focus:ring-blue-500 outline-none" 
+              value={pixCode} 
+              onChange={e => setPixCode(e.target.value)} 
+            />
+            
+            <button 
+              onClick={lancarVenda} 
+              className="w-full bg-green-500 hover:bg-green-600 text-white py-5 rounded-2xl font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-green-200"
+            >
+              Lançar Venda Oficial
+            </button>
           </div>
 
-          <textarea 
-            placeholder="Cole aqui o Código Pix..." 
-            className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl mb-6 text-[11px] font-mono font-bold text-gray-900 h-24 resize-none focus:ring-2 focus:ring-blue-500 outline-none" 
-            value={pixCode} 
-            onChange={e => setPixCode(e.target.value)} 
-          />
-          
-          <button 
-            onClick={lancarVenda} 
-            className="w-full bg-green-500 hover:bg-green-600 text-white py-5 rounded-2xl font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-green-200"
-          >
-            Lançar Venda Oficial
-          </button>
+          {/* ---> NOVA SEÇÃO: ATIVIDADES DO CLIENTE <--- */}
+          <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-[10px] font-black text-purple-600 uppercase tracking-widest flex items-center gap-2">
+                <Eye size={16}/> Histórico de Atividades
+              </h2>
+              {clienteSelecionado && (
+                <button onClick={() => carregarLogs(clienteSelecionado.id)} className="p-2 text-gray-400 hover:text-purple-600 transition-colors">
+                  <RefreshCcw size={14} />
+                </button>
+              )}
+            </div>
+
+            {!clienteSelecionado ? (
+              <div className="py-8 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                <p className="text-gray-400 text-xs font-bold uppercase tracking-tighter">Selecione um cliente para ver o rastro</p>
+              </div>
+            ) : logsCliente.length === 0 ? (
+              <div className="py-8 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                <p className="text-gray-400 text-xs font-bold">Nenhuma atividade registrada ainda.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {logsCliente.map((log) => (
+                  <div key={log.id} className="flex gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:border-purple-200 transition-all">
+                    <div className="mt-1 bg-white p-2 rounded-full h-fit border border-gray-200 text-purple-500 shadow-sm">
+                      <Clock size={14} />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start mb-1">
+                        <span className="text-xs font-black text-gray-900">{log.acao}</span>
+                        <span className="text-[9px] font-mono font-bold text-gray-400 bg-white px-2 py-0.5 rounded-lg border">
+                          {new Date(log.created_at).toLocaleString('pt-BR', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' })}
+                        </span>
+                      </div>
+                      <p className="text-[10px] font-medium text-gray-500 leading-relaxed">{log.detalhes}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
         </div>
 
         {/* TABELA DE VENDAS */}
-        <div className="lg:col-span-3 bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="lg:col-span-3 bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mt-8">
           <div className="p-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/30">
             <h2 className="text-xs font-black text-blue-600 uppercase tracking-widest flex items-center gap-2">
               <CreditCard size={16}/> Vendas Lançadas
