@@ -113,9 +113,12 @@ export default function Dashboard() {
   return (
     <div className="flex min-h-screen bg-[#f8f9fa] font-sans relative">
       
-      {/* MENU LATERAL */}
+      {/* MENU LATERAL - LOGO RESTAURADA AQUI */}
       <aside className="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col">
-        <div className="p-6 border-b border-gray-100 flex items-center justify-center gap-3 h-24"></div>
+        <div className="p-6 border-b border-gray-100 flex items-center gap-3">
+          <img src={logo} alt="Ck Soluções" className="w-10 h-10 object-contain" />
+          <span className="font-black text-lg text-gray-900">Ck Soluções</span>
+        </div>
         <nav className="flex-1 px-4 py-6 space-y-2">
           <NavButton active={abaAtiva === 'inicio'} icon={<LayoutDashboard size={20} />} label="Início" onClick={() => setAbaAtiva('inicio')} />
           <NavButton active={abaAtiva === 'pedidos'} icon={<ShoppingBag size={20} />} label="Meus Pedidos" onClick={() => setAbaAtiva('pedidos')} />
@@ -169,7 +172,7 @@ export default function Dashboard() {
                 {pedidos.map((p) => (
                   <div key={p.id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
                     <div className="text-center md:text-left flex flex-col gap-1 w-full md:w-auto">
-                      <span className="inline-block bg-purple-50 text-purple-700 border border-purple-100 text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-widest w-fit">CÓDIGO: {perfil?.codigo_cobranca}</span>
+                      <span className="inline-block bg-purple-50 text-purple-700 border border-purple-100 text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-widest w-fit mx-auto md:mx-0 mb-1">CÓDIGO: {perfil?.codigo_cobranca}</span>
                       <h4 className="font-black text-gray-900 text-sm">{p.produto}</h4>
                       <p className="text-green-600 font-black text-xl">R$ {p.valor}</p>
                     </div>
@@ -203,7 +206,7 @@ export default function Dashboard() {
         )}
       </main>
 
-      {/* --- MODAL DE REEMBOLSO ADAPTADO AO PRINT --- */}
+      {/* MODAL DE REEMBOLSO ADAPTADO AO PRINT */}
       {isReembolsoOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-2 md:p-4 overflow-y-auto">
           <div className="bg-white rounded-[28px] w-full max-w-2xl p-5 md:p-8 relative shadow-2xl animate-in zoom-in duration-200 my-auto">
@@ -212,7 +215,6 @@ export default function Dashboard() {
             <div className="flex flex-col items-center text-center mb-5">
               <div className={`p-3 rounded-full mb-3 shadow-sm ${!temPedidoPago && !pedidoReembolso ? 'bg-red-50 text-red-500' : 'bg-blue-50 text-blue-500'}`}><RefreshCcw size={28} /></div>
               
-              {/* CORES CONFORME O PRINT (BORDEAUX/VERMELHO ESCURO) */}
               {!temPedidoPago && !pedidoReembolso ? (
                 <>
                   <h2 className="text-base md:text-lg font-black text-[#8B0000] uppercase tracking-tighter leading-tight px-4">AVISO: NENHUMA COMPRA CONCLUÍDA PARA SOLICITAR REEMBOLSO.</h2>
@@ -227,7 +229,6 @@ export default function Dashboard() {
             </div>
 
             <div className={`grid grid-cols-1 md:grid-cols-2 gap-3.5 ${(!temPedidoPago && !pedidoReembolso) ? 'opacity-50 grayscale-[0.5]' : ''}`}>
-              {/* TÍTULOS DE SEÇÃO EM PRETO/GRAFITE ESCURO */}
               <div className="md:col-span-2"><h3 className="text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1 flex items-center gap-2"><Hash size={12}/> DADOS DO PEDIDO</h3></div>
               
               <FormInput label="Nº DO PEDIDO" placeholder="Ex: 12345678" value={pedidoReembolso?.id?.substring(0,8).toUpperCase() || ''} icon={<Hash size={14} className="text-gray-900"/>} />
@@ -265,10 +266,10 @@ export default function Dashboard() {
               <FormInput label="NOME DO TITULAR DA CONTA" value={`${perfil?.nome} ${perfil?.sobrenome}`} readOnly icon={<User size={14} className="text-gray-900"/>} />
             </div>
 
-            {/* RÉGUA DE STATUS CONFORME O PRINT */}
+            {/* RÉGUA DE STATUS */}
             <div className="mt-8 mb-6 px-1">
                <div className="flex justify-between items-center relative">
-                  <div className="absolute h-0.5 bg-gray-200 w-full top-1/2 -translate-y-1/2 z-0"></div>
+                  <div className="absolute h-0.5 bg-gray-100 w-full top-1/2 -translate-y-1/2 z-0"></div>
                   <StatusStep icon={<Send size={14}/>} label="Solicitação Enviada" active={temPedidoPago && !!pedidoReembolso} />
                   <StatusStep icon={<Clock size={14}/>} label="2 Dias Úteis para Análise" />
                   <StatusStep icon={<Search size={14}/>} label="Análise Concluída" />
