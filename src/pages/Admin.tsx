@@ -207,6 +207,10 @@ export default function Admin() {
               >
                 <div className="flex flex-col">
                   <span>{c.nome} {c.sobrenome}</span>
+                  {/* AQUI ESTÁ A NOVIDADE: O e-mail do cliente inserido com estilo suave */}
+                  <span className={`text-[10px] font-medium mt-0.5 truncate ${clienteSelecionado?.id === c.id ? 'text-blue-100' : 'text-gray-500'}`}>
+                    {c.email || 'Sem e-mail'}
+                  </span>
                   <span className={`text-[10px] font-black uppercase mt-1 ${clienteSelecionado?.id === c.id ? 'text-blue-200' : 'text-green-600'}`}>
                     CÓD: {c.codigo_cobranca || 'S/ CÓDIGO'}
                   </span>
@@ -285,7 +289,7 @@ export default function Admin() {
           </button>
         </div>
 
-        {/* TABELA DE VENDAS (AGORA MOSTRA TODAS!) */}
+        {/* TABELA DE VENDAS */}
         <div className="lg:col-span-3 bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="p-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/30">
             <h2 className="text-xs font-black text-blue-600 uppercase tracking-widest flex items-center gap-2">
@@ -326,7 +330,6 @@ export default function Admin() {
                           <Edit3 size={14} /> Pix
                         </button>
                         
-                        {/* AQUI ESTÁ A MÁGICA: Botão muda para Aprovado se a venda estiver paga */}
                         {v.status === 'pago' ? (
                           <span className="bg-gray-100 text-gray-500 px-4 py-2 rounded-xl font-black text-[10px] uppercase border border-gray-200 cursor-default select-none">
                             Aprovado
@@ -433,4 +436,4 @@ export default function Admin() {
   );
 }
 
-function NavButton({ icon, label, active, onClick }: any) { return ( <button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${active ? 'bg-blue-50 text-blue-700' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}> {icon} <span className="text-sm">{label}</span> </button> ); }
+function NavButton({ icon, label, active, onClick }: any) { return ( <button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${active ? 'bg-blue-50 text-blue-700' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}> {icon} <span className="text-sm">{label}</span> </button> ); }git add .
