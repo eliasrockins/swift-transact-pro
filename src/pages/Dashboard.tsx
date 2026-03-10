@@ -6,7 +6,7 @@ import {
   User, LayoutDashboard, ShoppingBag, 
   LogOut, ChevronRight, RefreshCcw, Package, 
   CreditCard, X, Copy, Check, ArrowLeft, Clock, Key, AlertCircle, Upload, FileText, Image as ImageIcon,
-  Hash, Tag, HelpCircle, MessageSquare, Send, Search, Banknote
+  Hash, Tag, HelpCircle, MessageSquare, Send, Search, Banknote, Lock
 } from 'lucide-react';
 import { toast } from "sonner";
 import logo from "@/assets/logo.png";
@@ -203,38 +203,41 @@ export default function Dashboard() {
         )}
       </main>
 
-      {/* --- MODAL DE REEMBOLSO COM TEXTOS EM PRETO --- */}
+      {/* --- MODAL DE REEMBOLSO ADAPTADO AO PRINT --- */}
       {isReembolsoOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-2 md:p-4 overflow-y-auto">
           <div className="bg-white rounded-[28px] w-full max-w-2xl p-5 md:p-8 relative shadow-2xl animate-in zoom-in duration-200 my-auto">
             <button onClick={() => { setIsReembolsoOpen(false); setPedidoReembolso(null); setArquivoSelecionado(null); }} className="absolute top-4 right-4 text-gray-300 hover:text-gray-900 bg-gray-50 p-1.5 rounded-full transition-colors"><X size={18} /></button>
             
             <div className="flex flex-col items-center text-center mb-5">
-              <div className={`p-3 rounded-full mb-3 shadow-sm ${!temPedidoPago && !pedidoReembolso ? 'bg-red-50 text-red-500' : 'bg-blue-50 text-blue-500'}`}><RefreshCcw size={28} className="animate-spin-slow" /></div>
+              <div className={`p-3 rounded-full mb-3 shadow-sm ${!temPedidoPago && !pedidoReembolso ? 'bg-red-50 text-red-500' : 'bg-blue-50 text-blue-500'}`}><RefreshCcw size={28} /></div>
+              
+              {/* CORES CONFORME O PRINT (BORDEAUX/VERMELHO ESCURO) */}
               {!temPedidoPago && !pedidoReembolso ? (
                 <>
-                  <h2 className="text-base md:text-lg font-black text-red-700 uppercase tracking-tighter">AVISO: NENHUMA COMPRA CONCLUÍDA.</h2>
-                  <p className="text-red-500/70 text-xs font-bold mt-1">Este formulário está inativo por falta de pedidos elegíveis.</p>
+                  <h2 className="text-base md:text-lg font-black text-[#8B0000] uppercase tracking-tighter leading-tight px-4">AVISO: NENHUMA COMPRA CONCLUÍDA PARA SOLICITAR REEMBOLSO.</h2>
+                  <p className="text-[#8B0000]/80 text-xs font-bold mt-1.5">Este formulário está inativo. Não há pedidos elegíveis.</p>
                 </>
               ) : (
                 <>
                   <h2 className="text-xl font-black text-gray-900">Solicitar Reembolso</h2>
-                  <p className="text-black text-[11px] md:text-xs mt-1 max-w-md mx-auto font-medium">Preencha os campos abaixo com precisão para processarmos sua solicitação.</p>
+                  <p className="text-gray-600 text-[11px] md:text-xs mt-1 max-w-md mx-auto font-medium">Preencha os campos abaixo com precisão para processarmos sua solicitação.</p>
                 </>
               )}
             </div>
 
-            <div className={`grid grid-cols-1 md:grid-cols-2 gap-3.5 ${(!temPedidoPago && !pedidoReembolso) ? 'opacity-40 pointer-events-none' : ''}`}>
-              <div className="md:col-span-2"><h3 className="text-[9px] font-black text-black uppercase tracking-widest mb-1 flex items-center gap-2"><Hash size={12}/> Dados do Pedido</h3></div>
+            <div className={`grid grid-cols-1 md:grid-cols-2 gap-3.5 ${(!temPedidoPago && !pedidoReembolso) ? 'opacity-50 grayscale-[0.5]' : ''}`}>
+              {/* TÍTULOS DE SEÇÃO EM PRETO/GRAFITE ESCURO */}
+              <div className="md:col-span-2"><h3 className="text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1 flex items-center gap-2"><Hash size={12}/> DADOS DO PEDIDO</h3></div>
               
-              <FormInput label="Nº do Pedido" placeholder="Ex: 12345678" value={pedidoReembolso?.id?.substring(0,8).toUpperCase() || ''} icon={<Hash size={14} className="text-black"/>} />
-              <FormInput label="Nome do Item" placeholder="Ex: Produto X" value={pedidoReembolso?.produto || ''} icon={<Package size={14} className="text-black"/>} />
-              <FormInput label="Código/SKU" placeholder="Ex: SKU_123" icon={<Tag size={14} className="text-black"/>} />
+              <FormInput label="Nº DO PEDIDO" placeholder="Ex: 12345678" value={pedidoReembolso?.id?.substring(0,8).toUpperCase() || ''} icon={<Hash size={14} className="text-gray-900"/>} />
+              <FormInput label="NOME DO ITEM" placeholder="Ex: Produto X" value={pedidoReembolso?.produto || ''} icon={<Package size={14} className="text-gray-900"/>} />
+              <FormInput label="CÓDIGO/SKU" placeholder="Ex: SKU_123" icon={<Tag size={14} className="text-gray-900"/>} />
               
               <div className="space-y-1.5">
-                <label className="text-[9px] font-black text-black uppercase ml-1 flex items-center gap-1"><HelpCircle size={11}/> Motivo</label>
-                <select className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs font-bold text-black outline-none focus:ring-2 focus:ring-blue-500 appearance-none">
-                  <option>Produto com Defeito</option>
+                <label className="text-[10px] font-black text-gray-900 uppercase ml-1 flex items-center gap-1"><HelpCircle size={11}/> MOTIVO DO REEMBOLSO (Selecione)</label>
+                <select className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs font-bold text-gray-900 outline-none appearance-none">
+                  <option>{(!temPedidoPago && !pedidoReembolso) ? 'Indisponível (Sem compra)' : 'Produto com Defeito'}</option>
                   <option>Item Incorreto Recebido</option>
                   <option>Atraso na Entrega</option>
                   <option>Item Não Recebido</option>
@@ -242,50 +245,50 @@ export default function Dashboard() {
                 </select>
               </div>
 
-              <div className="md:col-span-2 mt-2"><h3 className="text-[9px] font-black text-black uppercase tracking-widest mb-1 flex items-center gap-2"><ImageIcon size={12}/> Comprovação</h3></div>
+              <div className="md:col-span-2 mt-2"><h3 className="text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1 flex items-center gap-2"><ImageIcon size={12}/> COMPROVAÇÃO E DETALHES</h3></div>
               
               <div className="space-y-1.5">
-                <label className="text-[9px] font-black text-black uppercase ml-1">Anexar Comprovante/Foto</label>
+                <label className="text-[10px] font-black text-gray-900 uppercase ml-1">ANEXAR FOTO (Para defeitos ou item incorreto)</label>
                 <label className="flex items-center gap-2 p-3 bg-gray-50 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-100 transition-all">
-                  <Upload size={16} className="text-black" />
-                  <span className="text-[11px] font-bold text-black truncate">{arquivoSelecionado ? arquivoSelecionado.name : 'Escolher Arquivo'}</span>
-                  <input type="file" className="hidden" onChange={(e) => e.target.files && setArquivoSelecionado(e.target.files[0])} />
+                  <Upload size={16} className="text-gray-900" />
+                  <span className="text-[11px] font-bold text-gray-600 truncate">{arquivoSelecionado ? arquivoSelecionado.name : 'Escolher Arquivo'}</span>
+                  <input type="file" className="hidden" disabled={!temPedidoPago && !pedidoReembolso} onChange={(e) => e.target.files && setArquivoSelecionado(e.target.files[0])} />
                 </label>
               </div>
 
               <div className="space-y-1.5 md:col-span-2">
-                <label className="text-[9px] font-black text-black uppercase ml-1 flex items-center gap-1"><MessageSquare size={11}/> Comentários (Opcional)</label>
-                <textarea placeholder="Detalhes adicionais..." className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs font-bold text-black h-20 resize-none outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400" />
+                <label className="text-[10px] font-black text-gray-900 uppercase ml-1 flex items-center gap-1"><MessageSquare size={11}/> COMENTÁRIOS ADICIONAIS (Opcional)</label>
+                <textarea placeholder="Descreva o problema com mais detalhes..." className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs font-bold text-gray-900 h-20 resize-none outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400" />
               </div>
 
-              <div className="md:col-span-2 mt-2 border-t pt-4"><h3 className="text-[9px] font-black text-black uppercase tracking-widest mb-1 flex items-center gap-2"><User size={12}/> Titularidade</h3></div>
-              <FormInput label="Nome do Titular" value={`${perfil?.nome} ${perfil?.sobrenome}`} readOnly icon={<User size={14} className="text-black"/>} />
+              <div className="md:col-span-2 mt-2 border-t pt-4"><h3 className="text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1 flex items-center gap-2"><User size={12}/> STATUS E ACOMPANHAMENTO</h3></div>
+              <FormInput label="NOME DO TITULAR DA CONTA" value={`${perfil?.nome} ${perfil?.sobrenome}`} readOnly icon={<User size={14} className="text-gray-900"/>} />
             </div>
 
-            {/* RÉGUA DE STATUS */}
-            <div className="mt-6 mb-6 px-1">
+            {/* RÉGUA DE STATUS CONFORME O PRINT */}
+            <div className="mt-8 mb-6 px-1">
                <div className="flex justify-between items-center relative">
-                  <div className="absolute h-0.5 bg-gray-100 w-full top-1/2 -translate-y-1/2 z-0"></div>
-                  <StatusStep icon={<Send size={12}/>} label="Solicitado" active={temPedidoPago && !!pedidoReembolso} />
-                  <StatusStep icon={<Clock size={12}/>} label="Em Análise" />
-                  <StatusStep icon={<Search size={12}/>} label="Concluído" />
-                  <StatusStep icon={<Banknote size={12}/>} label="Processado" />
+                  <div className="absolute h-0.5 bg-gray-200 w-full top-1/2 -translate-y-1/2 z-0"></div>
+                  <StatusStep icon={<Send size={14}/>} label="Solicitação Enviada" active={temPedidoPago && !!pedidoReembolso} />
+                  <StatusStep icon={<Clock size={14}/>} label="2 Dias Úteis para Análise" />
+                  <StatusStep icon={<Search size={14}/>} label="Análise Concluída" />
+                  <StatusStep icon={<Banknote size={14}/>} label="Reembolso Processado" />
                </div>
             </div>
 
             {(!temPedidoPago && !pedidoReembolso) ? (
-              <button disabled className="w-full bg-gray-300 text-white py-4 rounded-xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 cursor-not-allowed">
-                <AlertCircle size={16}/> SOLICITAÇÃO INATIVA
+              <button disabled className="w-full bg-[#A3A3A3] text-white py-5 rounded-2xl font-black uppercase tracking-widest text-[11px] flex items-center justify-center gap-2 cursor-not-allowed shadow-md">
+                <Lock size={18}/> ENVIAR SOLICITAÇÃO COMPLETA (INATIVO)
               </button>
             ) : (
               <button 
                 onClick={enviarSolicitacaoReembolso} disabled={enviandoSolicitacao}
-                className="w-full bg-[#28a745] hover:bg-[#218838] text-white py-4 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-green-100 transition-all active:scale-95"
+                className="w-full bg-[#28a745] hover:bg-[#218838] text-white py-5 rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-lg shadow-green-100 transition-all active:scale-95"
               >
                 {enviandoSolicitacao ? 'ENVIANDO...' : 'ENVIAR SOLICITAÇÃO COMPLETA'}
               </button>
             )}
-            <p className="text-center text-[8px] font-bold text-black mt-3 uppercase">Concordo com os termos de reembolso ao enviar.</p>
+            <p className="text-center text-[9px] font-bold text-gray-500 mt-3 uppercase">Ao enviar, você concorda com nossos termos de reembolso.</p>
           </div>
         </div>
       )}
@@ -293,7 +296,6 @@ export default function Dashboard() {
   );
 }
 
-// COMPONENTES AUXILIARES ATUALIZADOS
 function NavButton({ icon, label, active, onClick }: any) { return ( <button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${active ? 'bg-blue-50 text-blue-700' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}> {icon} <span className="text-sm">{label}</span> </button> ); }
 function ActionCard({ icon, title, color, onClick }: any) { return ( <div onClick={onClick} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between group cursor-pointer hover:shadow-md transition-all"> <div className="flex items-center gap-4"> <div className={`p-4 rounded-xl ${color}`}>{icon}</div> <span className="font-black text-gray-900 text-sm">{title}</span> </div> <ChevronRight size={20} className="text-gray-300 group-hover:text-blue-500 transform group-hover:translate-x-1 transition-all" /> </div> ); }
 function DataRow({ label, value }: any) { return ( <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100"> <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">{label}</p> <p className="text-gray-900 font-black text-sm">{value || 'Não informado'}</p> </div> ); }
@@ -301,12 +303,12 @@ function DataRow({ label, value }: any) { return ( <div className="bg-gray-50 p-
 function FormInput({ label, placeholder, value, readOnly, icon }: any) { 
   return ( 
     <div className="space-y-1.5"> 
-      <label className="text-[9px] font-black text-black uppercase ml-1 flex items-center gap-1">{icon} {label}</label> 
+      <label className="text-[10px] font-black text-gray-900 uppercase ml-1 flex items-center gap-1">{icon} {label}</label> 
       <input 
         readOnly={readOnly} 
         value={value} 
         placeholder={placeholder} 
-        className={`w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs font-bold text-black outline-none focus:ring-2 focus:ring-blue-500 ${readOnly ? 'cursor-not-allowed opacity-70' : ''}`} 
+        className={`w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs font-bold text-gray-900 outline-none focus:ring-2 focus:ring-blue-500 ${readOnly ? 'cursor-not-allowed opacity-70' : ''}`} 
       /> 
     </div> 
   ); 
@@ -315,8 +317,7 @@ function FormInput({ label, placeholder, value, readOnly, icon }: any) {
 function StatusStep({ icon, label, active }: any) { 
   return ( 
     <div className="flex flex-col items-center gap-1.5 z-10 w-1/4"> 
-      <div className={`p-2 rounded-full border-2 transition-all ${active ? 'bg-blue-600 border-blue-600 text-white scale-110 shadow-lg' : 'bg-white border-gray-200 text-gray-300'}`}> {icon} </div> 
-      <span className={`text-[7px] font-black text-center uppercase tracking-tighter leading-tight ${active ? 'text-blue-600' : 'text-black'}`}>{label}</span> 
+      <div className={`p-3 rounded-full border-2 transition-all ${active ? 'bg-blue-600 border-blue-600 text-white scale-110 shadow-lg' : 'bg-white border-gray-200 text-gray-400'}`}> {icon} </div> 
+      <span className={`text-[8px] font-black text-center uppercase tracking-tighter leading-tight ${active ? 'text-blue-600' : 'text-gray-400'}`}>{label}</span> 
     </div> 
   ); 
-}
