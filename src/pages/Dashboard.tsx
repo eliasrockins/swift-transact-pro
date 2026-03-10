@@ -30,6 +30,20 @@ export default function Dashboard() {
   
   const navigate = useNavigate();
 
+  // ---> NOVA FUNÇÃO: O ESPIÃO DE ATIVIDADES <---
+  const registrarLog = async (acao: string, detalhes: string = '') => {
+    if (!user) return;
+    try {
+      await supabase.from('logs_atividades').insert([{
+        cliente_id: user.id,
+        acao: acao,
+        detalhes: detalhes
+      }]);
+    } catch (error) {
+      console.log("Erro silencioso no log", error);
+    }
+  };
+
   // ESCUTADOR DE EVENTOS DE AUTENTICAÇÃO
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -85,6 +99,10 @@ export default function Dashboard() {
     navigator.clipboard.writeText(codigo);
     setCopiou(id);
     toast.success("Código Pix copiado!");
+    
+    // ANOTANDO NO DIÁRIO:
+    registrarLog('Copiou o Código PIX', `Clicou em copiar para pagar.`);
+    
     setTimeout(() => setCopiou(null), 3000);
   };
 
@@ -93,6 +111,9 @@ export default function Dashboard() {
       return toast.info("Aguarde. O administrador ainda está gerando sua cobrança.");
     }
     setPagamentoAberto(pedido);
+
+    // ANOTANDO NO DIÁRIO:
+    registrarLog('Abriu tela de Pagamento', `Clicou em Pagar Agora no produto: ${pedido.produto}`);
   };
 
   const salvarNovaSenha = async () => {
@@ -107,6 +128,9 @@ export default function Dashboard() {
       toast.success("Senha atualizada com sucesso!");
       setIsResetModalOpen(false);
       setNovaSenha('');
+
+      // ANOTANDO NO DIÁRIO:
+      registrarLog('Alterou a Senha', 'O cliente redefiniu a própria senha de acesso.');
     }
     setAtualizandoSenha(false);
   };
@@ -159,9 +183,30 @@ export default function Dashboard() {
 
         {abaAtiva === 'inicio' && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <ActionCard icon={<RefreshCcw className="text-blue-500" />} title="Solicitar Reembolso" color="bg-blue-50" onClick={() => setIsReembolsoOpen(true)} />
-            <ActionCard icon={<Package className="text-yellow-600" />} title="Acompanhar Pedido" color="bg-yellow-50" onClick={() => setAbaAtiva('pedidos')} />
-            <ActionCard icon={<CreditCard className="text-green-600" />} title="Status do Pagamento" color="bg-green-50" onClick={() => setAbaAtiva('pedidos')} />
+            <ActionCard 
+              icon={<RefreshCcw className="text-blue-500" />} 
+              title="Solicitar Reembolso" color="bg-blue-50" 
+              onClick={() => {
+                setIsReembolsoOpen(true);
+                registrarLog('Clicou em Reembolso', 'O cliente abriu a tela de reembolso no início.');
+              }} 
+            />
+            <ActionCard 
+              icon={<Package className="text-yellow-600" />} 
+              title="Acompanhar Pedido" color="bg-yellow-50" 
+              onClick={() => {
+                setAbaAtiva('pedidos');
+                registrarLog('Acessou Meus Pedidos', 'Através do botão "Acompanhar Pedido".');
+              }} 
+            />
+            <ActionCard 
+              icon={<CreditCard className="text-green-600" />} 
+              title="Status do Pagamento" color="bg-green-50" 
+              onClick={() => {
+                setAbaAtiva('pedidos');
+                registrarLog('Acessou Meus Pedidos', 'Através do botão "Status do Pagamento".');
+              }} 
+            />
           </div>
         )}
 
@@ -288,7 +333,6 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* MODAL DE REEMBOLSO COM O ERRO CORRIGIDO */}
       {isReembolsoOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl w-full max-w-md p-8 relative shadow-2xl animate-in zoom-in duration-200">
@@ -300,11 +344,19 @@ export default function Dashboard() {
             <div className="space-y-5">
               <div>
                 <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Nome do Titular da Conta</label>
-                {/* AQUI ESTÁ A CORREÇÃO: Usando o || '' para evitar o "undefined undefined" */}
                 <input readOnly value={`${perfil?.nome || ''} ${perfil?.sobrenome || ''}`.trim()} className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-black outline-none" />
               </div>
               <div><label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Código de validação</label><input placeholder="Digite o código aqui..." className="w-full p-4 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 font-black placeholder:text-gray-400" /></div>
-              <button onClick={() => {toast.success("Solicitação enviada!"); setIsReembolsoOpen(false);}} className="w-full bg-[#28a745] hover:bg-[#218838] text-white py-4 rounded-xl font-black shadow-lg shadow-green-100 transition-all active:scale-95 mt-4 uppercase tracking-widest text-xs">Enviar Solicitação</button>
+              <button 
+                onClick={() => {
+                  toast.success("Solicitação enviada!"); 
+                  setIsReembolsoOpen(false);
+                  registrarLog('Enviou formulário de Reembolso', 'O cliente confirmou o pedido de reembolso.');
+                }} 
+                className="w-full bg-[#28a745] hover:bg-[#218838] text-white py-4 rounded-xl font-black shadow-lg shadow-green-100 transition-all active:scale-95 mt-4 uppercase tracking-widest text-xs"
+              >
+                Enviar Solicitação
+              </button>
             </div>
           </div>
         </div>
