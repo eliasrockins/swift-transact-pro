@@ -24,9 +24,10 @@ export default function Dashboard() {
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
   const [novaSenha, setNovaSenha] = useState('');
   const [atualizandoSenha, setAtualizandoSenha] = useState(false);
-  
-  // ESTADO DO NOVO AVISO ESTILOSO
   const [isAlertPedidoOpen, setIsAlertPedidoOpen] = useState(false);
+
+  // NOVO ESTADO: GUARDA QUAL PEDIDO FOI CLICADO PARA REEMBOLSO
+  const [pedidoReembolso, setPedidoReembolso] = useState<any>(null);
 
   const navigate = useNavigate();
 
@@ -178,10 +179,10 @@ export default function Dashboard() {
             <ActionCard 
               icon={<RefreshCcw className="text-blue-500" />} title="Solicitar Reembolso" color="bg-blue-50" 
               onClick={() => { 
-                if (pedidos.length === 0) {
-                  // AVISO ESTILOSO
+                const pedidosPagos = pedidos.filter(p => p.status === 'pago');
+                if (pedidosPagos.length === 0) {
                   setIsAlertPedidoOpen(true);
-                  registrarLog('Tentou pedir Reembolso', 'Bloqueado no início: Nenhum pedido ativo.');
+                  registrarLog('Tentou pedir Reembolso', 'Bloqueado no início: Nenhum pagamento concluído.');
                 } else {
                   setAbaAtiva('pedidos'); 
                   toast.info("Selecione o pedido que deseja reembolsar.");
@@ -224,6 +225,7 @@ export default function Dashboard() {
                       {p.status === 'pago' && (
                         <div 
                           onClick={() => { 
+                            setPedidoReembolso(p); // GUARDA O PEDIDO CLICADO
                             setIsReembolsoOpen(true); 
                             registrarLog('Clicou em Reembolso', `Via histórico no pedido: ${p.produto}`); 
                           }}
@@ -280,7 +282,6 @@ export default function Dashboard() {
         </button>
       </nav>
 
-      {/* ---> MODAL ESTILOSO COM TEXTO ALTERADO <--- */}
       {isAlertPedidoOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl w-full max-w-sm p-8 relative shadow-2xl animate-in zoom-in duration-200 text-center flex flex-col items-center">
@@ -345,10 +346,16 @@ export default function Dashboard() {
         </div>
       )}
 
+      {/* ---> MODAL DE REEMBOLSO ATUALIZADO COM O PRODUTO <--- */}
       {isReembolsoOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl w-full max-w-md p-8 relative shadow-2xl animate-in zoom-in duration-200">
-            <button onClick={() => setIsReembolsoOpen(false)} className="absolute top-6 right-6 text-gray-400 hover:text-gray-900 transition-colors bg-gray-100 p-2 rounded-full"><X size={20} /></button>
+            <button 
+              onClick={() => { setIsReembolsoOpen(false); setPedidoReembolso(null); }} 
+              className="absolute top-6 right-6 text-gray-400 hover:text-gray-900 transition-colors bg-gray-100 p-2 rounded-full"
+            >
+              <X size={20} />
+            </button>
             <div className="flex flex-col items-center text-center gap-4 mb-8 mt-4">
               <div className="p-4 rounded-full bg-blue-50 text-blue-600"><RefreshCcw size={32} /></div>
               <div><h2 className="text-2xl font-black text-gray-900">Solicitar Reembolso</h2><p className="text-gray-500 text-sm mt-2">Preencha os dados para iniciarmos o processo.</p></div>
@@ -358,12 +365,23 @@ export default function Dashboard() {
                 <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Nome do Titular da Conta</label>
                 <input readOnly value={`${perfil?.nome || ''} ${perfil?.sobrenome || ''}`.trim()} className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-black outline-none" />
               </div>
-              <div><label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Código de validação</label><input placeholder="Digite o código aqui..." className="w-full p-4 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 font-black placeholder:text-gray-400" /></div>
+
+              {/* NOVO CAMPO COM O NOME DO PRODUTO */}
+              <div>
+                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Pedido</label>
+                <input readOnly value={pedidoReembolso?.produto || ''} className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-black outline-none truncate" />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Código de validação</label>
+                <input placeholder="Digite o código aqui..." className="w-full p-4 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 font-black placeholder:text-gray-400" />
+              </div>
               <button 
                 onClick={() => {
                   toast.success("Solicitação enviada!"); 
                   setIsReembolsoOpen(false);
-                  registrarLog('Enviou formulário de Reembolso', 'O cliente confirmou o pedido de reembolso.');
+                  registrarLog('Enviou formulário de Reembolso', `O cliente confirmou o pedido de reembolso do produto: ${pedidoReembolso?.produto || ''}`);
+                  setPedidoReembolso(null);
                 }} 
                 className="w-full bg-[#28a745] hover:bg-[#218838] text-white py-4 rounded-xl font-black shadow-lg shadow-green-100 transition-all active:scale-95 mt-4 uppercase tracking-widest text-xs"
               >
