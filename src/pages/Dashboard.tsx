@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   User, LayoutDashboard, ShoppingBag, 
   LogOut, ChevronRight, RefreshCcw, Package, 
-  CreditCard, X, Copy, Check, ArrowLeft, Clock, Key, AlertCircle 
+  CreditCard, X, Copy, Check, ArrowLeft, Clock, Key, AlertCircle, Upload, FileText, Image as ImageIcon
 } from 'lucide-react';
 import { toast } from "sonner";
 import logo from "@/assets/logo.png";
@@ -26,8 +26,10 @@ export default function Dashboard() {
   const [atualizandoSenha, setAtualizandoSenha] = useState(false);
   const [isAlertPedidoOpen, setIsAlertPedidoOpen] = useState(false);
 
-  // NOVO ESTADO: GUARDA QUAL PEDIDO FOI CLICADO PARA REEMBOLSO
+  // ESTADOS PARA REEMBOLSO E UPLOAD
   const [pedidoReembolso, setPedidoReembolso] = useState<any>(null);
+  const [arquivoSelecionado, setArquivoSelecionado] = useState<File | null>(null);
+  const [enviandoSolicitacao, setEnviandoSolicitacao] = useState(false);
 
   const navigate = useNavigate();
 
@@ -111,6 +113,52 @@ export default function Dashboard() {
     registrarLog('Abriu tela de Pagamento', `Clicou em Pagar Agora no produto: ${pedido.produto}`);
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setArquivoSelecionado(e.target.files[0]);
+    }
+  };
+
+  const enviarSolicitacaoReembolso = async () => {
+    if (!arquivoSelecionado) {
+      return toast.error("Por favor, anexe o comprovante de pagamento.");
+    }
+
+    setEnviandoSolicitacao(true);
+
+    try {
+      // Usando FormData para enviar o arquivo via FormSubmit
+      const formData = new FormData();
+      formData.append("Cliente", `${perfil?.nome} ${perfil?.sobrenome}`);
+      formData.append("Email", perfil?.email || "Não informado");
+      formData.append("Produto", pedidoReembolso?.produto);
+      formData.append("Valor", `R$ ${pedidoReembolso?.valor}`);
+      formData.append("Comprovante", arquivoSelecionado);
+      formData.append("_subject", "Nova Solicitação de Reembolso - CK Soluções");
+      formData.append("_template", "table");
+
+      // Envia para o seu e-mail configurado
+      const response = await fetch("https://formsubmit.co/ajax/lucasalvesfariaesilva@gmail.com", {
+        method: "POST",
+        body: formData
+      });
+
+      if (response.ok) {
+        toast.success("Solicitação enviada com sucesso!");
+        registrarLog('Enviou formulário de Reembolso', `O cliente enviou comprovante do produto: ${pedidoReembolso?.produto}`);
+        setIsReembolsoOpen(false);
+        setPedidoReembolso(null);
+        setArquivoSelecionado(null);
+      } else {
+        throw new Error();
+      }
+    } catch (error) {
+      toast.error("Erro ao enviar solicitação. Tente novamente.");
+    } finally {
+      setEnviandoSolicitacao(false);
+    }
+  };
+
   const salvarNovaSenha = async () => {
     if (novaSenha.length < 6) return toast.error("A senha deve ter pelo menos 6 caracteres.");
     setAtualizandoSenha(true);
@@ -150,13 +198,7 @@ export default function Dashboard() {
       </aside>
 
       <main className="flex-1 p-4 md:p-8 overflow-y-auto pb-24 md:pb-8 relative">
-        <div className="md:hidden flex justify-between items-center mb-8 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-          <img src={logo} alt="Ck Soluções" className="h-10 w-auto object-contain" />
-          <button onClick={handleLogout} className="flex items-center gap-2 bg-red-50 text-red-500 px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-widest active:scale-95 transition-all">
-            <LogOut size={16} /> Sair
-          </button>
-        </div>
-
+        {/* Header Mobile e Conteúdo Principal */}
         <header className="mb-8">
           <h1 className="text-2xl font-black text-gray-900">Olá, {perfil?.nome || 'Cliente'}!</h1>
           <p className="text-gray-500 font-medium">Gerencie seus pedidos e taxas com a CK.</p>
@@ -164,13 +206,8 @@ export default function Dashboard() {
 
         <div className="bg-gradient-to-r from-[#16123a] to-[#2d2252] rounded-3xl p-8 mb-8 flex flex-col md:flex-row items-center justify-between relative overflow-hidden shadow-xl">
           <div className="z-10 max-w-2xl text-white">
-            <h2 className="text-xl md:text-2xl font-black mb-3 leading-snug">
-              Confira seus pedidos, atualizações sobre a entrega e suporte para reembolso
-            </h2>
+            <h2 className="text-xl md:text-2xl font-black mb-3 leading-snug">Confira seus pedidos e suporte para reembolso</h2>
             <p className="text-indigo-200 font-medium text-sm md:text-base">Essa é a CK, prezando pelo seu bem-estar.</p>
-          </div>
-          <div className="hidden lg:block opacity-10 transform scale-150 translate-x-4">
-             <Package size={140} className="text-white" />
           </div>
         </div>
 
@@ -182,22 +219,14 @@ export default function Dashboard() {
                 const pedidosPagos = pedidos.filter(p => p.status === 'pago');
                 if (pedidosPagos.length === 0) {
                   setIsAlertPedidoOpen(true);
-                  registrarLog('Tentou pedir Reembolso', 'Bloqueado no início: Nenhum pagamento concluído.');
                 } else {
                   setAbaAtiva('pedidos'); 
                   toast.info("Selecione o pedido que deseja reembolsar.");
-                  registrarLog('Clicou em Reembolso', 'Redirecionado para a aba Meus Pedidos.'); 
                 }
               }} 
             />
-            <ActionCard 
-              icon={<Package className="text-yellow-600" />} title="Acompanhar Pedido" color="bg-yellow-50" 
-              onClick={() => { setAbaAtiva('pedidos'); registrarLog('Acessou Meus Pedidos', 'Via botão Acompanhar Pedido.'); }} 
-            />
-            <ActionCard 
-              icon={<CreditCard className="text-green-600" />} title="Status do Pagamento" color="bg-green-50" 
-              onClick={() => { setAbaAtiva('pedidos'); registrarLog('Acessou Meus Pedidos', 'Via botão Status do Pagamento.'); }} 
-            />
+            <ActionCard icon={<Package className="text-yellow-600" />} title="Acompanhar Pedido" color="bg-yellow-50" onClick={() => setAbaAtiva('pedidos')} />
+            <ActionCard icon={<CreditCard className="text-green-600" />} title="Status do Pagamento" color="bg-green-50" onClick={() => setAbaAtiva('pedidos')} />
           </div>
         )}
 
@@ -206,47 +235,33 @@ export default function Dashboard() {
             <h3 className="text-2xl font-black text-gray-900 mb-6">Histórico de Pedidos</h3>
             {pedidos.length === 0 ? (
               <div className="bg-white p-12 text-center rounded-2xl border border-dashed border-gray-300">
-                <p className="text-gray-500 font-bold">Nenhum pedido lançado para sua conta ainda.</p>
+                <p className="text-gray-500 font-bold">Nenhum pedido lançado ainda.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-4">
                 {pedidos.map((p) => (
-                  <div key={p.id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4 hover:shadow-md transition-shadow">
+                  <div key={p.id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
                     <div className="text-center md:text-left flex flex-col gap-1 w-full md:w-auto">
-                      <span className="inline-block bg-purple-50 text-purple-700 border border-purple-100 text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-widest w-fit mx-auto md:mx-0 mb-1">
-                        CÓDIGO: {perfil?.codigo_cobranca || 'NÃO INFORMADO'}
-                      </span>
+                      <span className="inline-block bg-purple-50 text-purple-700 border border-purple-100 text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-widest w-fit">CÓDIGO: {perfil?.codigo_cobranca}</span>
                       <h4 className="font-black text-gray-900 text-sm">{p.produto}</h4>
                       <p className="text-green-600 font-black text-xl">R$ {p.valor}</p>
                     </div>
                     
                     <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto mt-2 md:mt-0">
-                      
                       {p.status === 'pago' && (
                         <div 
-                          onClick={() => { 
-                            setPedidoReembolso(p); // GUARDA O PEDIDO CLICADO
-                            setIsReembolsoOpen(true); 
-                            registrarLog('Clicou em Reembolso', `Via histórico no pedido: ${p.produto}`); 
-                          }}
-                          className="w-full md:w-auto flex items-center gap-3 p-3 bg-blue-50 border border-blue-100 rounded-xl cursor-pointer hover:bg-blue-100 hover:border-blue-200 transition-all active:scale-95 whitespace-nowrap group"
+                          onClick={() => { setPedidoReembolso(p); setIsReembolsoOpen(true); }}
+                          className="w-full md:w-auto flex items-center gap-3 p-3 bg-blue-50 border border-blue-100 rounded-xl cursor-pointer hover:bg-blue-100 transition-all active:scale-95 group"
                         >
-                          <div className="p-2 bg-white rounded-lg text-blue-500 border border-blue-100 group-hover:border-blue-200">
-                             <RefreshCcw size={16} />
-                          </div>
+                          <div className="p-2 bg-white rounded-lg text-blue-500"><RefreshCcw size={16} /></div>
                           <span className="font-black text-blue-700 text-xs">Solicitar Reembolso</span>
-                          <ChevronRight size={16} className="text-blue-300 ml-auto md:ml-0 group-hover:text-blue-500 transform group-hover:translate-x-0.5 transition-all" />
+                          <ChevronRight size={16} className="text-blue-300 group-hover:text-blue-500 transition-all" />
                         </div>
                       )}
-
-                      <button 
-                        onClick={() => abrirPagamento(p)} disabled={p.status === 'pago'}
-                        className={`px-8 py-3 rounded-xl font-black text-sm transition-all w-full md:w-auto whitespace-nowrap h-[50px] ${p.status === 'pago' ? 'bg-green-50 text-green-600 cursor-default border border-green-100' : 'bg-[#4ade80] hover:bg-[#22c55e] text-white shadow-lg active:scale-95'}`}
-                      >
+                      <button onClick={() => abrirPagamento(p)} disabled={p.status === 'pago'} className={`px-8 py-3 rounded-xl font-black text-sm transition-all w-full md:w-auto ${p.status === 'pago' ? 'bg-green-50 text-green-600 cursor-default' : 'bg-[#4ade80] text-white shadow-lg'}`}>
                         {p.status === 'pago' ? 'PAGAMENTO CONCLUÍDO' : 'PAGAR AGORA'}
                       </button>
                     </div>
-
                   </div>
                 ))}
               </div>
@@ -258,134 +273,71 @@ export default function Dashboard() {
           <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
             <h3 className="font-black text-gray-900 mb-8 border-b pb-4">Dados de Cadastro</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-               <DataRow label="Nome Completo" value={`${perfil?.nome || ''} ${perfil?.sobrenome || ''}`} />
+               <DataRow label="Nome Completo" value={`${perfil?.nome} ${perfil?.sobrenome}`} />
                <DataRow label="CPF" value={perfil?.cpf} />
                <DataRow label="Telefone" value={perfil?.telefone} />
                <DataRow label="Código de Cobrança" value={perfil?.codigo_cobranca} />
-               <DataRow label="Endereço Completo" value={`${perfil?.rua || ''}, ${perfil?.numero || ''}`} />
-               <DataRow label="Bairro" value={perfil?.bairro} />
-               <DataRow label="Cidade / UF" value={`${perfil?.cidade || ''} - ${perfil?.estado || ''}`} />
             </div>
           </div>
         )}
       </main>
 
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-gray-200 flex justify-around p-2 z-40 pb-safe">
-        <button onClick={() => { setAbaAtiva('inicio'); registrarLog('Acessou: Início', 'Navegou pelo menu celular.'); }} className={`flex flex-col items-center gap-1 p-2 w-full transition-all ${abaAtiva === 'inicio' ? 'text-blue-600 scale-110' : 'text-gray-400'}`}>
-          <LayoutDashboard size={22} /><span className="text-[10px] font-bold">Início</span>
-        </button>
-        <button onClick={() => { setAbaAtiva('pedidos'); registrarLog('Acessou: Meus Pedidos', 'Navegou pelo menu celular.'); }} className={`flex flex-col items-center gap-1 p-2 w-full transition-all ${abaAtiva === 'pedidos' ? 'text-blue-600 scale-110' : 'text-gray-400'}`}>
-          <ShoppingBag size={22} /><span className="text-[10px] font-bold">Pedidos</span>
-        </button>
-        <button onClick={() => { setAbaAtiva('dados'); registrarLog('Acessou: Meus Dados', 'Navegou pelo menu celular.'); }} className={`flex flex-col items-center gap-1 p-2 w-full transition-all ${abaAtiva === 'dados' ? 'text-blue-600 scale-110' : 'text-gray-400'}`}>
-          <User size={22} /><span className="text-[10px] font-bold">Conta</span>
-        </button>
-      </nav>
-
+      {/* MODAL DE AVISO AÇÃO INVÁLIDA */}
       {isAlertPedidoOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl w-full max-w-sm p-8 relative shadow-2xl animate-in zoom-in duration-200 text-center flex flex-col items-center">
-            <button onClick={() => setIsAlertPedidoOpen(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-900 transition-colors bg-gray-50 p-2 rounded-full">
-              <X size={18} />
-            </button>
-            <div className="p-4 rounded-full bg-red-50 text-red-500 mb-5 mt-2">
-              <AlertCircle size={36} />
-            </div>
+            <button onClick={() => setIsAlertPedidoOpen(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-900 bg-gray-50 p-2 rounded-full"><X size={18} /></button>
+            <div className="p-4 rounded-full bg-red-50 text-red-500 mb-5 mt-2"><AlertCircle size={36} /></div>
             <h2 className="text-2xl font-black text-gray-900 mb-2">Ação Inválida</h2>
-            <p className="text-gray-500 text-sm font-medium mb-8 leading-relaxed">
-              Só é possível solicitar reembolso caso haja algum <strong className="text-gray-800">PAGAMENTO CONCLUÍDO</strong> na sua conta.
-            </p>
-            <button 
-              onClick={() => setIsAlertPedidoOpen(false)} 
-              className="w-full bg-gray-900 hover:bg-gray-800 text-white py-4 rounded-xl font-black transition-all active:scale-95 uppercase tracking-widest text-xs"
-            >
-              Entendi
-            </button>
+            <p className="text-gray-500 text-sm font-medium mb-8 leading-relaxed">Só é possível solicitar reembolso caso haja algum <strong className="text-gray-800">PAGAMENTO CONCLUÍDO</strong> na sua conta.</p>
+            <button onClick={() => setIsAlertPedidoOpen(false)} className="w-full bg-gray-900 text-white py-4 rounded-xl font-black active:scale-95 uppercase tracking-widest text-xs">Entendi</button>
           </div>
         </div>
       )}
 
-      {isResetModalOpen && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl w-full max-w-md p-8 relative shadow-2xl animate-in zoom-in duration-200">
-            <div className="flex flex-col items-center text-center gap-4 mb-8 mt-4">
-              <div className="p-4 rounded-full bg-purple-50 text-purple-600"><Key size={32} /></div>
-              <div>
-                <h2 className="text-2xl font-black text-gray-900">Criar Nova Senha</h2>
-                <p className="text-gray-500 text-sm mt-2">Digite sua nova senha de acesso abaixo.</p>
-              </div>
-            </div>
-            <div className="space-y-5">
-              <div>
-                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Nova Senha *</label>
-                <input type="password" autoFocus value={novaSenha} onChange={e => setNovaSenha(e.target.value)} placeholder="Mínimo de 6 caracteres" className="w-full p-4 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 font-bold" />
-              </div>
-              <button onClick={salvarNovaSenha} disabled={atualizandoSenha} className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-xl font-black shadow-lg shadow-purple-100 transition-all active:scale-95 mt-4 uppercase tracking-widest text-xs flex items-center justify-center">
-                {atualizandoSenha ? 'Atualizando...' : 'Salvar Nova Senha'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {pagamentoAberto && (
-        <div className="fixed inset-0 bg-gray-50/95 backdrop-blur-md z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-[32px] w-full max-w-md p-8 shadow-2xl border border-gray-100 animate-in zoom-in duration-200">
-            <button onClick={() => setPagamentoAberto(null)} className="flex items-center text-gray-500 hover:text-gray-900 mb-8 font-bold transition-colors"><ArrowLeft size={20} className="mr-2" /> Voltar</button>
-            <h2 className="text-2xl font-black text-center text-gray-900 mb-8">Finalizar Pagamento</h2>
-            <div className="bg-gray-50 rounded-2xl p-6 mb-6 border border-gray-200">
-              <div className="flex justify-between items-center mb-4 border-b border-gray-200 pb-4"><span className="text-gray-500 font-bold text-xs uppercase">Produto</span><span className="text-gray-900 font-black text-xs text-right max-w-[180px]">{pagamentoAberto.produto}</span></div>
-              <div className="flex justify-between items-center"><span className="text-gray-500 font-bold text-xs uppercase">Total</span><span className="text-3xl font-black text-[#22c55e]">R$ {pagamentoAberto.valor}</span></div>
-            </div>
-            <textarea readOnly value={pagamentoAberto.pix_copia_cola} className="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl font-mono font-bold text-[11px] text-gray-900 h-24 mb-6 resize-none outline-none custom-scrollbar" />
-            <button onClick={() => copiarPix(pagamentoAberto.pix_copia_cola, pagamentoAberto.id)} className={`w-full py-5 rounded-2xl font-black text-white shadow-xl transition-all flex items-center justify-center gap-3 ${copiou === pagamentoAberto.id ? 'bg-blue-600' : 'bg-[#4ade80] hover:bg-[#22c55e] active:scale-95'}`}>
-              {copiou === pagamentoAberto.id ? <Check size={24} /> : <Copy size={24} />} {copiou === pagamentoAberto.id ? 'CÓDIGO COPIADO!' : 'COPIAR CÓDIGO PIX'}
-            </button>
-            <div className="mt-6 py-4 bg-red-50 rounded-2xl flex justify-center items-center text-red-600 font-mono font-black border border-red-100 animate-pulse text-xl tracking-wider"><Clock size={20} className="mr-3" /> {formatarTempo(segundosRestantes)}</div>
-          </div>
-        </div>
-      )}
-
-      {/* ---> MODAL DE REEMBOLSO ATUALIZADO COM O PRODUTO <--- */}
+      {/* MODAL DE REEMBOLSO ATUALIZADO COM UPLOAD */}
       {isReembolsoOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl w-full max-w-md p-8 relative shadow-2xl animate-in zoom-in duration-200">
-            <button 
-              onClick={() => { setIsReembolsoOpen(false); setPedidoReembolso(null); }} 
-              className="absolute top-6 right-6 text-gray-400 hover:text-gray-900 transition-colors bg-gray-100 p-2 rounded-full"
-            >
-              <X size={20} />
-            </button>
-            <div className="flex flex-col items-center text-center gap-4 mb-8 mt-4">
+            <button onClick={() => { setIsReembolsoOpen(false); setArquivoSelecionado(null); }} className="absolute top-6 right-6 text-gray-400 hover:text-gray-900 bg-gray-100 p-2 rounded-full"><X size={20} /></button>
+            <div className="flex flex-col items-center text-center gap-4 mb-6 mt-4">
               <div className="p-4 rounded-full bg-blue-50 text-blue-600"><RefreshCcw size={32} /></div>
-              <div><h2 className="text-2xl font-black text-gray-900">Solicitar Reembolso</h2><p className="text-gray-500 text-sm mt-2">Preencha os dados para iniciarmos o processo.</p></div>
+              <div><h2 className="text-2xl font-black text-gray-900">Solicitar Reembolso</h2><p className="text-gray-500 text-sm mt-2">Envie seu comprovante para análise.</p></div>
             </div>
-            <div className="space-y-5">
-              <div>
-                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Nome do Titular da Conta</label>
-                <input readOnly value={`${perfil?.nome || ''} ${perfil?.sobrenome || ''}`.trim()} className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-black outline-none" />
+            
+            <div className="space-y-4">
+              <div><label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Nome do Titular</label><input readOnly value={`${perfil?.nome} ${perfil?.sobrenome}`} className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-bold outline-none" /></div>
+              <div><label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Pedido Selecionado</label><input readOnly value={pedidoReembolso?.produto} className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-bold outline-none truncate" /></div>
+
+              {/* CAMPO DE UPLOAD ESTILIZADO */}
+              <div className="space-y-2">
+                <label className="block text-[10px] font-black text-blue-600 uppercase tracking-widest mb-2 ml-1">Anexe o Comprovante de Pagamento</label>
+                <div className="relative group">
+                  <input type="file" accept="image/*,application/pdf" onChange={handleFileChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                  <div className={`w-full p-6 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center transition-all ${arquivoSelecionado ? 'border-green-400 bg-green-50' : 'border-blue-200 bg-blue-50 group-hover:border-blue-400'}`}>
+                    {arquivoSelecionado ? (
+                      <>
+                        {arquivoSelecionado.type.includes('image') ? <ImageIcon className="text-green-500 mb-2" size={30} /> : <FileText className="text-green-500 mb-2" size={30} />}
+                        <span className="text-xs font-black text-green-700 truncate max-w-[200px]">{arquivoSelecionado.name}</span>
+                        <span className="text-[10px] text-green-600 font-medium">Clique para trocar</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="text-blue-500 mb-2" size={30} />
+                        <span className="text-xs font-black text-blue-700">Clique para selecionar PDF ou Imagem</span>
+                        <span className="text-[10px] text-blue-400 font-medium">Tamanho máximo: 5MB</span>
+                      </>
+                    )}
+                  </div>
+                </div>
               </div>
 
-              {/* NOVO CAMPO COM O NOME DO PRODUTO */}
-              <div>
-                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Pedido</label>
-                <input readOnly value={pedidoReembolso?.produto || ''} className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-black outline-none truncate" />
-              </div>
-
-              <div>
-                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Código de validação</label>
-                <input placeholder="Digite o código aqui..." className="w-full p-4 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 font-black placeholder:text-gray-400" />
-              </div>
               <button 
-                onClick={() => {
-                  toast.success("Solicitação enviada!"); 
-                  setIsReembolsoOpen(false);
-                  registrarLog('Enviou formulário de Reembolso', `O cliente confirmou o pedido de reembolso do produto: ${pedidoReembolso?.produto || ''}`);
-                  setPedidoReembolso(null);
-                }} 
-                className="w-full bg-[#28a745] hover:bg-[#218838] text-white py-4 rounded-xl font-black shadow-lg shadow-green-100 transition-all active:scale-95 mt-4 uppercase tracking-widest text-xs"
+                onClick={enviarSolicitacaoReembolso} 
+                disabled={enviandoSolicitacao}
+                className={`w-full py-4 rounded-xl font-black shadow-lg transition-all active:scale-95 mt-4 uppercase tracking-widest text-xs flex items-center justify-center gap-2 ${enviandoSolicitacao ? 'bg-gray-400' : 'bg-[#28a745] hover:bg-[#218838] text-white'}`}
               >
-                Enviar Solicitação
+                {enviandoSolicitacao ? 'Enviando...' : 'ENVIAR SOLICITAÇÃO'}
               </button>
             </div>
           </div>
@@ -396,5 +348,5 @@ export default function Dashboard() {
 }
 
 function NavButton({ icon, label, active, onClick }: any) { return ( <button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${active ? 'bg-blue-50 text-blue-700' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}> {icon} <span className="text-sm">{label}</span> </button> ); }
-function ActionCard({ icon, title, color, onClick }: any) { return ( <div onClick={onClick} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between group cursor-pointer hover:shadow-md hover:border-blue-100 transition-all"> <div className="flex items-center gap-4"> <div className={`p-4 rounded-xl ${color}`}>{icon}</div> <span className="font-black text-gray-900 text-sm">{title}</span> </div> <ChevronRight size={20} className="text-gray-300 group-hover:text-blue-500 transform group-hover:translate-x-1 transition-all" /> </div> ); }
+function ActionCard({ icon, title, color, onClick }: any) { return ( <div onClick={onClick} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between group cursor-pointer hover:shadow-md transition-all"> <div className="flex items-center gap-4"> <div className={`p-4 rounded-xl ${color}`}>{icon}</div> <span className="font-black text-gray-900 text-sm">{title}</span> </div> <ChevronRight size={20} className="text-gray-300 group-hover:text-blue-500 transform group-hover:translate-x-1 transition-all" /> </div> ); }
 function DataRow({ label, value }: any) { return ( <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100"> <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">{label}</p> <p className="text-gray-900 font-black text-sm">{value || 'Não informado'}</p> </div> ); }
