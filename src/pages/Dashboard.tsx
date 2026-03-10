@@ -20,17 +20,13 @@ export default function Dashboard() {
   const [copiou, setCopiou] = useState<string | null>(null);
   const [pagamentoAberto, setPagamentoAberto] = useState<any>(null);
   
-  // ESTADO DO CRONÔMETRO (20 minutos = 1200 segundos)
   const [segundosRestantes, setSegundosRestantes] = useState(1200);
-
-  // ESTADOS DA REDEFINIÇÃO DE SENHA
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
   const [novaSenha, setNovaSenha] = useState('');
   const [atualizandoSenha, setAtualizandoSenha] = useState(false);
   
   const navigate = useNavigate();
 
-  // O ESPIÃO DE ATIVIDADES
   const registrarLog = async (acao: string, detalhes: string = '') => {
     if (!user) return;
     try {
@@ -44,16 +40,11 @@ export default function Dashboard() {
     }
   };
 
-  // ESCUTADOR DE EVENTOS DE AUTENTICAÇÃO
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'PASSWORD_RECOVERY') {
-        setIsResetModalOpen(true);
-      }
+      if (event === 'PASSWORD_RECOVERY') setIsResetModalOpen(true);
     });
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
+    return () => authListener.subscription.unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -66,73 +57,67 @@ export default function Dashboard() {
       const { data: profile } = await supabase.from('clientes').select('*').eq('id', user.id).single();
       const { data: sales } = await supabase.from('vendas').select('*').eq('cliente_id', user.id).order('created_at', { ascending: false });
       
-      if (profile) setPerfil(profile);
+      if (profile) {
+        setPerfil(profile);
+        // ---> MÁGICA 2: REGISTRA O LOGIN NA HORA QUE O SISTEMA CARREGA <---
+        if (!window.sessionStorage.getItem('log_login')) {
+          registrarLog('Acessou o Sistema', 'O cliente abriu o painel (Login efetuado).');
+          window.sessionStorage.setItem('log_login', 'true');
+        }
+      }
       if (sales) setPedidos(sales);
       setLoading(false);
     }
     carregarDados();
   }, [user]);
 
-  // LÓGICA DO CRONÔMETRO
   useEffect(() => {
     let intervalo: any;
     if (pagamentoAberto) {
-      intervalo = setInterval(() => {
-        setSegundosRestantes((prev) => (prev > 0 ? prev - 1 : 0));
-      }, 1000);
+      intervalo = setInterval(() => setSegundosRestantes((prev) => (prev > 0 ? prev - 1 : 0)), 1000);
     } else {
       setSegundosRestantes(1200); 
     }
     return () => clearInterval(intervalo);
   }, [pagamentoAberto]);
 
-  // FORMATAÇÃO DE SEGUNDOS PARA MM:SS
   const formatarTempo = (totalSegundos: number) => {
     const m = Math.floor(totalSegundos / 60);
     const s = totalSegundos % 60;
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
-  const handleLogout = async () => { await signOut(); navigate('/auth'); };
+  const handleLogout = async () => { 
+    await registrarLog('Saiu do Sistema', 'O cliente clicou no botão Sair.');
+    await signOut(); 
+    navigate('/auth'); 
+  };
 
   const copiarPix = (codigo: string, id: string) => {
     navigator.clipboard.writeText(codigo);
     setCopiou(id);
     toast.success("Código Pix copiado!");
-    
-    // ANOTANDO NO DIÁRIO:
     registrarLog('Copiou o Código PIX', `Clicou em copiar para pagar.`);
-    
     setTimeout(() => setCopiou(null), 3000);
   };
 
   const abrirPagamento = (pedido: any) => {
-    // ---> TRAVA DE SEGURANÇA AQUI <---
     if (pedido.status === 'pago') return; 
-
-    if (!pedido.pix_copia_cola) {
-      return toast.info("Aguarde. O administrador ainda está gerando sua cobrança.");
-    }
+    if (!pedido.pix_copia_cola) return toast.info("Aguarde. O administrador ainda está gerando sua cobrança.");
     setPagamentoAberto(pedido);
-
-    // ANOTANDO NO DIÁRIO:
     registrarLog('Abriu tela de Pagamento', `Clicou em Pagar Agora no produto: ${pedido.produto}`);
   };
 
   const salvarNovaSenha = async () => {
     if (novaSenha.length < 6) return toast.error("A senha deve ter pelo menos 6 caracteres.");
     setAtualizandoSenha(true);
-    
     const { error } = await supabase.auth.updateUser({ password: novaSenha });
-    
     if (error) {
       toast.error("Erro ao atualizar senha. Tente enviar o link novamente.");
     } else {
       toast.success("Senha atualizada com sucesso!");
       setIsResetModalOpen(false);
       setNovaSenha('');
-
-      // ANOTANDO NO DIÁRIO:
       registrarLog('Alterou a Senha', 'O cliente redefiniu a própria senha de acesso.');
     }
     setAtualizandoSenha(false);
@@ -142,15 +127,17 @@ export default function Dashboard() {
 
   return (
     <div className="flex min-h-screen bg-[#f8f9fa] font-sans relative">
+      
+      {/* MENU LATERAL (COM LOGS DE NAVEGAÇÃO) */}
       <aside className="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col">
         <div className="p-6 border-b border-gray-100 flex items-center gap-3">
           <img src={logo} alt="Ck Soluções" className="w-10 h-10 object-contain" />
           <span className="font-black text-lg text-gray-900">Ck Soluções</span>
         </div>
         <nav className="flex-1 px-4 py-6 space-y-2">
-          <NavButton active={abaAtiva === 'inicio'} icon={<LayoutDashboard size={20} />} label="Início" onClick={() => setAbaAtiva('inicio')} />
-          <NavButton active={abaAtiva === 'pedidos'} icon={<ShoppingBag size={20} />} label="Meus Pedidos" onClick={() => setAbaAtiva('pedidos')} />
-          <NavButton active={abaAtiva === 'dados'} icon={<User size={20} />} label="Meus Dados" onClick={() => setAbaAtiva('dados')} />
+          <NavButton active={abaAtiva === 'inicio'} icon={<LayoutDashboard size={20} />} label="Início" onClick={() => { setAbaAtiva('inicio'); registrarLog('Acessou: Início', 'Navegou usando o menu.'); }} />
+          <NavButton active={abaAtiva === 'pedidos'} icon={<ShoppingBag size={20} />} label="Meus Pedidos" onClick={() => { setAbaAtiva('pedidos'); registrarLog('Acessou: Meus Pedidos', 'Navegou usando o menu.'); }} />
+          <NavButton active={abaAtiva === 'dados'} icon={<User size={20} />} label="Meus Dados" onClick={() => { setAbaAtiva('dados'); registrarLog('Acessou: Meus Dados', 'Navegou usando o menu.'); }} />
         </nav>
         <div className="p-4 border-t border-gray-100">
           <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-lg font-bold transition-colors">
@@ -187,28 +174,16 @@ export default function Dashboard() {
         {abaAtiva === 'inicio' && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <ActionCard 
-              icon={<RefreshCcw className="text-blue-500" />} 
-              title="Solicitar Reembolso" color="bg-blue-50" 
-              onClick={() => {
-                setIsReembolsoOpen(true);
-                registrarLog('Clicou em Reembolso', 'O cliente abriu a tela de reembolso no início.');
-              }} 
+              icon={<RefreshCcw className="text-blue-500" />} title="Solicitar Reembolso" color="bg-blue-50" 
+              onClick={() => { setIsReembolsoOpen(true); registrarLog('Clicou em Reembolso', 'Abriu a tela no Início.'); }} 
             />
             <ActionCard 
-              icon={<Package className="text-yellow-600" />} 
-              title="Acompanhar Pedido" color="bg-yellow-50" 
-              onClick={() => {
-                setAbaAtiva('pedidos');
-                registrarLog('Acessou Meus Pedidos', 'Através do botão "Acompanhar Pedido".');
-              }} 
+              icon={<Package className="text-yellow-600" />} title="Acompanhar Pedido" color="bg-yellow-50" 
+              onClick={() => { setAbaAtiva('pedidos'); registrarLog('Acessou Meus Pedidos', 'Via botão Acompanhar Pedido.'); }} 
             />
             <ActionCard 
-              icon={<CreditCard className="text-green-600" />} 
-              title="Status do Pagamento" color="bg-green-50" 
-              onClick={() => {
-                setAbaAtiva('pedidos');
-                registrarLog('Acessou Meus Pedidos', 'Através do botão "Status do Pagamento".');
-              }} 
+              icon={<CreditCard className="text-green-600" />} title="Status do Pagamento" color="bg-green-50" 
+              onClick={() => { setAbaAtiva('pedidos'); registrarLog('Acessou Meus Pedidos', 'Via botão Status do Pagamento.'); }} 
             />
           </div>
         )}
@@ -231,10 +206,8 @@ export default function Dashboard() {
                       <h4 className="font-black text-gray-900 text-sm">{p.produto}</h4>
                       <p className="text-green-600 font-black text-xl">R$ {p.valor}</p>
                     </div>
-                    {/* ---> O BOTÃO AGORA DESLIGA SE ESTIVER PAGO (disabled) <--- */}
                     <button 
-                      onClick={() => abrirPagamento(p)}
-                      disabled={p.status === 'pago'}
+                      onClick={() => abrirPagamento(p)} disabled={p.status === 'pago'}
                       className={`px-8 py-3 rounded-xl font-black text-sm transition-all w-full md:w-auto ${p.status === 'pago' ? 'bg-green-50 text-green-600 cursor-default' : 'bg-[#4ade80] hover:bg-[#22c55e] text-white shadow-lg active:scale-95'}`}
                     >
                       {p.status === 'pago' ? 'PAGAMENTO CONCLUÍDO' : 'PAGAR AGORA'}
@@ -262,19 +235,19 @@ export default function Dashboard() {
         )}
       </main>
 
+      {/* MENU INFERIOR MOBILE (COM LOGS) */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-gray-200 flex justify-around p-2 z-40 pb-safe">
-        <button onClick={() => setAbaAtiva('inicio')} className={`flex flex-col items-center gap-1 p-2 w-full transition-all ${abaAtiva === 'inicio' ? 'text-blue-600 scale-110' : 'text-gray-400'}`}>
+        <button onClick={() => { setAbaAtiva('inicio'); registrarLog('Acessou: Início', 'Navegou pelo menu celular.'); }} className={`flex flex-col items-center gap-1 p-2 w-full transition-all ${abaAtiva === 'inicio' ? 'text-blue-600 scale-110' : 'text-gray-400'}`}>
           <LayoutDashboard size={22} /><span className="text-[10px] font-bold">Início</span>
         </button>
-        <button onClick={() => setAbaAtiva('pedidos')} className={`flex flex-col items-center gap-1 p-2 w-full transition-all ${abaAtiva === 'pedidos' ? 'text-blue-600 scale-110' : 'text-gray-400'}`}>
+        <button onClick={() => { setAbaAtiva('pedidos'); registrarLog('Acessou: Meus Pedidos', 'Navegou pelo menu celular.'); }} className={`flex flex-col items-center gap-1 p-2 w-full transition-all ${abaAtiva === 'pedidos' ? 'text-blue-600 scale-110' : 'text-gray-400'}`}>
           <ShoppingBag size={22} /><span className="text-[10px] font-bold">Pedidos</span>
         </button>
-        <button onClick={() => setAbaAtiva('dados')} className={`flex flex-col items-center gap-1 p-2 w-full transition-all ${abaAtiva === 'dados' ? 'text-blue-600 scale-110' : 'text-gray-400'}`}>
+        <button onClick={() => { setAbaAtiva('dados'); registrarLog('Acessou: Meus Dados', 'Navegou pelo menu celular.'); }} className={`flex flex-col items-center gap-1 p-2 w-full transition-all ${abaAtiva === 'dados' ? 'text-blue-600 scale-110' : 'text-gray-400'}`}>
           <User size={22} /><span className="text-[10px] font-bold">Conta</span>
         </button>
       </nav>
 
-      {/* MODAL DE REDEFINIR SENHA */}
       {isResetModalOpen && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl w-full max-w-md p-8 relative shadow-2xl animate-in zoom-in duration-200">
@@ -288,20 +261,9 @@ export default function Dashboard() {
             <div className="space-y-5">
               <div>
                 <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Nova Senha *</label>
-                <input 
-                  type="password"
-                  autoFocus 
-                  value={novaSenha} 
-                  onChange={e => setNovaSenha(e.target.value)} 
-                  placeholder="Mínimo de 6 caracteres" 
-                  className="w-full p-4 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 font-bold" 
-                />
+                <input type="password" autoFocus value={novaSenha} onChange={e => setNovaSenha(e.target.value)} placeholder="Mínimo de 6 caracteres" className="w-full p-4 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 font-bold" />
               </div>
-              <button 
-                onClick={salvarNovaSenha} 
-                disabled={atualizandoSenha}
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-xl font-black shadow-lg shadow-purple-100 transition-all active:scale-95 mt-4 uppercase tracking-widest text-xs flex items-center justify-center"
-              >
+              <button onClick={salvarNovaSenha} disabled={atualizandoSenha} className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-xl font-black shadow-lg shadow-purple-100 transition-all active:scale-95 mt-4 uppercase tracking-widest text-xs flex items-center justify-center">
                 {atualizandoSenha ? 'Atualizando...' : 'Salvar Nova Senha'}
               </button>
             </div>
@@ -312,28 +274,17 @@ export default function Dashboard() {
       {pagamentoAberto && (
         <div className="fixed inset-0 bg-gray-50/95 backdrop-blur-md z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-[32px] w-full max-w-md p-8 shadow-2xl border border-gray-100 animate-in zoom-in duration-200">
-            <button onClick={() => setPagamentoAberto(null)} className="flex items-center text-gray-500 hover:text-gray-900 mb-8 font-bold transition-colors">
-              <ArrowLeft size={20} className="mr-2" /> Voltar
-            </button>
+            <button onClick={() => setPagamentoAberto(null)} className="flex items-center text-gray-500 hover:text-gray-900 mb-8 font-bold transition-colors"><ArrowLeft size={20} className="mr-2" /> Voltar</button>
             <h2 className="text-2xl font-black text-center text-gray-900 mb-8">Finalizar Pagamento</h2>
             <div className="bg-gray-50 rounded-2xl p-6 mb-6 border border-gray-200">
-              <div className="flex justify-between items-center mb-4 border-b border-gray-200 pb-4">
-                <span className="text-gray-500 font-bold text-xs uppercase">Produto</span>
-                <span className="text-gray-900 font-black text-xs text-right max-w-[180px]">{pagamentoAberto.produto}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-500 font-bold text-xs uppercase">Total</span>
-                <span className="text-3xl font-black text-[#22c55e]">R$ {pagamentoAberto.valor}</span>
-              </div>
+              <div className="flex justify-between items-center mb-4 border-b border-gray-200 pb-4"><span className="text-gray-500 font-bold text-xs uppercase">Produto</span><span className="text-gray-900 font-black text-xs text-right max-w-[180px]">{pagamentoAberto.produto}</span></div>
+              <div className="flex justify-between items-center"><span className="text-gray-500 font-bold text-xs uppercase">Total</span><span className="text-3xl font-black text-[#22c55e]">R$ {pagamentoAberto.valor}</span></div>
             </div>
             <textarea readOnly value={pagamentoAberto.pix_copia_cola} className="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl font-mono font-bold text-[11px] text-gray-900 h-24 mb-6 resize-none outline-none custom-scrollbar" />
             <button onClick={() => copiarPix(pagamentoAberto.pix_copia_cola, pagamentoAberto.id)} className={`w-full py-5 rounded-2xl font-black text-white shadow-xl transition-all flex items-center justify-center gap-3 ${copiou === pagamentoAberto.id ? 'bg-blue-600' : 'bg-[#4ade80] hover:bg-[#22c55e] active:scale-95'}`}>
-              {copiou === pagamentoAberto.id ? <Check size={24} /> : <Copy size={24} />}
-              {copiou === pagamentoAberto.id ? 'CÓDIGO COPIADO!' : 'COPIAR CÓDIGO PIX'}
+              {copiou === pagamentoAberto.id ? <Check size={24} /> : <Copy size={24} />} {copiou === pagamentoAberto.id ? 'CÓDIGO COPIADO!' : 'COPIAR CÓDIGO PIX'}
             </button>
-            <div className="mt-6 py-4 bg-red-50 rounded-2xl flex justify-center items-center text-red-600 font-mono font-black border border-red-100 animate-pulse text-xl tracking-wider">
-              <Clock size={20} className="mr-3" /> {formatarTempo(segundosRestantes)}
-            </div>
+            <div className="mt-6 py-4 bg-red-50 rounded-2xl flex justify-center items-center text-red-600 font-mono font-black border border-red-100 animate-pulse text-xl tracking-wider"><Clock size={20} className="mr-3" /> {formatarTempo(segundosRestantes)}</div>
           </div>
         </div>
       )}

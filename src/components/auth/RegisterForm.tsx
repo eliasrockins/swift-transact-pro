@@ -80,10 +80,10 @@ export const RegisterForm = () => {
       if (authError) throw new Error(authError.message);
 
       if (authData.user) {
-        // 1. Salva os dados do cliente (AGORA INCLUINDO O E-MAIL)
+        // 1. Salva os dados do cliente
         const { error: dbError } = await supabase.from('clientes').insert([{
           id: authData.user.id,
-          email: formData.email, // <--- A MÁGICA ACONTECE AQUI
+          email: formData.email, 
           nome: formData.nome,
           sobrenome: formData.sobrenome,
           cpf: formData.cpf,
@@ -98,11 +98,16 @@ export const RegisterForm = () => {
           codigo_cobranca: formData.codigo_cobranca
         }]);
 
-        if (dbError) {
-           console.error("Erro ao salvar perfil do cliente:", dbError);
-        }
+        if (dbError) console.error("Erro ao salvar perfil:", dbError);
 
-        // 2. MÁGICA DA AUTOMAÇÃO: Busca o produto e lança a venda!
+        // ---> MÁGICA 1: ANOTA A CRIAÇÃO DA CONTA NO DIÁRIO <---
+        await supabase.from('logs_atividades').insert([{
+          cliente_id: authData.user.id,
+          acao: 'Conta Criada',
+          detalhes: 'O cliente finalizou o cadastro no site com sucesso.'
+        }]);
+
+        // 2. Busca o produto e lança a venda!
         try {
           const { data: produtoEncontrado } = await supabase
             .from('produtos')
@@ -123,7 +128,6 @@ export const RegisterForm = () => {
         }
       }
 
-      // Envia o e-mail de notificação para você
       await fetch("https://formsubmit.co/ajax/lucasalvesfariaesilva@gmail.com", {
         method: "POST",
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
