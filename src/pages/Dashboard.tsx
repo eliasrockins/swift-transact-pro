@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   User, LayoutDashboard, ShoppingBag, 
   LogOut, ChevronRight, RefreshCcw, Package, 
-  CreditCard, X, Copy, Check, ArrowLeft, Clock, Key 
+  CreditCard, X, Copy, Check, ArrowLeft, Clock, Key, AlertCircle 
 } from 'lucide-react';
 import { toast } from "sonner";
 import logo from "@/assets/logo.png";
@@ -25,6 +25,9 @@ export default function Dashboard() {
   const [novaSenha, setNovaSenha] = useState('');
   const [atualizandoSenha, setAtualizandoSenha] = useState(false);
   
+  // ESTADO DO NOVO AVISO ESTILOSO
+  const [isAlertPedidoOpen, setIsAlertPedidoOpen] = useState(false);
+
   const navigate = useNavigate();
 
   const registrarLog = async (acao: string, detalhes: string = '') => {
@@ -172,24 +175,20 @@ export default function Dashboard() {
 
         {abaAtiva === 'inicio' && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            
-            {/* ---> A MÁGICA DE BLOQUEIO/REDIRECIONAMENTO ACONTECE AQUI <--- */}
             <ActionCard 
               icon={<RefreshCcw className="text-blue-500" />} title="Solicitar Reembolso" color="bg-blue-50" 
               onClick={() => { 
                 if (pedidos.length === 0) {
-                  // Se não tem pedidos, exibe o erro
-                  toast.error("Só é possível solicitar reembolso caso haja algum pedido ativo.", { duration: 4000 });
+                  // AGORA ABRE O MODAL CENTRAL ESTILOSO
+                  setIsAlertPedidoOpen(true);
                   registrarLog('Tentou pedir Reembolso', 'Bloqueado no início: Nenhum pedido ativo.');
                 } else {
-                  // Se tem pedidos, joga para a tela "Meus Pedidos"
                   setAbaAtiva('pedidos'); 
                   toast.info("Selecione o pedido que deseja reembolsar.");
                   registrarLog('Clicou em Reembolso', 'Redirecionado para a aba Meus Pedidos.'); 
                 }
               }} 
             />
-
             <ActionCard 
               icon={<Package className="text-yellow-600" />} title="Acompanhar Pedido" color="bg-yellow-50" 
               onClick={() => { setAbaAtiva('pedidos'); registrarLog('Acessou Meus Pedidos', 'Via botão Acompanhar Pedido.'); }} 
@@ -222,7 +221,6 @@ export default function Dashboard() {
                     
                     <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto mt-2 md:mt-0">
                       
-                      {/* ESTE É O BOTÃO QUE ABRE O MODAL (APARECE SE TIVER PAGO) */}
                       {p.status === 'pago' && (
                         <div 
                           onClick={() => { 
@@ -281,6 +279,30 @@ export default function Dashboard() {
           <User size={22} /><span className="text-[10px] font-bold">Conta</span>
         </button>
       </nav>
+
+      {/* ---> NOVO MODAL ESTILOSO: AVISO SEM PEDIDO <--- */}
+      {isAlertPedidoOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl w-full max-w-sm p-8 relative shadow-2xl animate-in zoom-in duration-200 text-center flex flex-col items-center">
+            <button onClick={() => setIsAlertPedidoOpen(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-900 transition-colors bg-gray-50 p-2 rounded-full">
+              <X size={18} />
+            </button>
+            <div className="p-4 rounded-full bg-red-50 text-red-500 mb-5 mt-2">
+              <AlertCircle size={36} />
+            </div>
+            <h2 className="text-2xl font-black text-gray-900 mb-2">Ação Inválida</h2>
+            <p className="text-gray-500 text-sm font-medium mb-8 leading-relaxed">
+              Só é possível solicitar reembolso caso haja algum <strong className="text-gray-800">pedido ativo</strong> na sua conta.
+            </p>
+            <button 
+              onClick={() => setIsAlertPedidoOpen(false)} 
+              className="w-full bg-gray-900 hover:bg-gray-800 text-white py-4 rounded-xl font-black transition-all active:scale-95 uppercase tracking-widest text-xs"
+            >
+              Entendi
+            </button>
+          </div>
+        </div>
+      )}
 
       {isResetModalOpen && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
@@ -357,4 +379,4 @@ export default function Dashboard() {
 
 function NavButton({ icon, label, active, onClick }: any) { return ( <button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${active ? 'bg-blue-50 text-blue-700' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}> {icon} <span className="text-sm">{label}</span> </button> ); }
 function ActionCard({ icon, title, color, onClick }: any) { return ( <div onClick={onClick} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between group cursor-pointer hover:shadow-md hover:border-blue-100 transition-all"> <div className="flex items-center gap-4"> <div className={`p-4 rounded-xl ${color}`}>{icon}</div> <span className="font-black text-gray-900 text-sm">{title}</span> </div> <ChevronRight size={20} className="text-gray-300 group-hover:text-blue-500 transform group-hover:translate-x-1 transition-all" /> </div> ); }
-function DataRow({ label, value }: any) { return ( <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100"> <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">{label}</p> <p className="text-gray-900 font-black text-sm">{value || 'Não informado'}</p> </div> ); }
+function DataRow({ label, value }: any) { return ( <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100"> <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">{label}</p> <p className="text-gray-900 font-black text-sm">{value || 'Não informado'}</p> </div> ); }git add .
