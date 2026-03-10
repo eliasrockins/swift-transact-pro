@@ -51,7 +51,6 @@ export default function Admin() {
         .select('*, clientes(nome, sobrenome, telefone, codigo_cobranca)')
         .order('created_at', { ascending: false });
       
-      // AQUI ESTÁ A MÁGICA: Ordenando clientes pelo mais recente primeiro!
       const { data: clients } = await supabase
         .from('clientes')
         .select('*')
@@ -208,7 +207,13 @@ export default function Admin() {
                 onClick={() => setClienteSelecionado(c)} 
                 className={`w-full text-left p-4 rounded-xl text-sm font-bold border transition-all flex justify-between items-center ${clienteSelecionado?.id === c.id ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-50 text-gray-900 hover:border-gray-400'}`}
               >
-                <span>{c.nome} {c.sobrenome}</span>
+                {/* AQUI ESTÁ A MÁGICA: Adicionando o Código de Cobrança abaixo do nome */}
+                <div className="flex flex-col">
+                  <span>{c.nome} {c.sobrenome}</span>
+                  <span className={`text-[10px] font-black uppercase mt-1 ${clienteSelecionado?.id === c.id ? 'text-blue-200' : 'text-green-600'}`}>
+                    CÓD: {c.codigo_cobranca || 'S/ CÓDIGO'}
+                  </span>
+                </div>
                 <span className={`text-[10px] font-medium ${clienteSelecionado?.id === c.id ? 'text-blue-200' : 'text-gray-500'}`}>
                   {c.telefone || 'S/ Tel'}
                 </span>
