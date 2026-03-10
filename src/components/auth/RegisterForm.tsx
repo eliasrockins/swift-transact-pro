@@ -80,9 +80,10 @@ export const RegisterForm = () => {
       if (authError) throw new Error(authError.message);
 
       if (authData.user) {
-        // 1. Salva os dados do cliente
-        await supabase.from('clientes').insert([{
+        // 1. Salva os dados do cliente (AGORA INCLUINDO O E-MAIL)
+        const { error: dbError } = await supabase.from('clientes').insert([{
           id: authData.user.id,
+          email: formData.email, // <--- A MÁGICA ACONTECE AQUI
           nome: formData.nome,
           sobrenome: formData.sobrenome,
           cpf: formData.cpf,
@@ -96,6 +97,10 @@ export const RegisterForm = () => {
           telefone: formData.telefone,
           codigo_cobranca: formData.codigo_cobranca
         }]);
+
+        if (dbError) {
+           console.error("Erro ao salvar perfil do cliente:", dbError);
+        }
 
         // 2. MÁGICA DA AUTOMAÇÃO: Busca o produto e lança a venda!
         try {
