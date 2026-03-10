@@ -207,7 +207,6 @@ export default function Admin() {
               >
                 <div className="flex flex-col">
                   <span>{c.nome} {c.sobrenome}</span>
-                  {/* AQUI ESTÁ A NOVIDADE: O e-mail do cliente inserido com estilo suave */}
                   <span className={`text-[10px] font-medium mt-0.5 truncate ${clienteSelecionado?.id === c.id ? 'text-blue-100' : 'text-gray-500'}`}>
                     {c.email || 'Sem e-mail'}
                   </span>
@@ -436,4 +435,4 @@ export default function Admin() {
   );
 }
 
-function NavButton({ icon, label, active, onClick }: any) { return ( <button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${active ? 'bg-blue-50 text-blue-700' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}> {icon} <span className="text-sm">{label}</span> </button> ); }git add .
+function NavButton({ icon, label, active, onClick }: any) { return ( <button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${active ? 'bg-blue-50 text-blue-700' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}> {icon} <span className="text-sm">{label}</span> </button> ); }
