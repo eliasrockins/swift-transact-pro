@@ -179,7 +179,7 @@ export default function Dashboard() {
               icon={<RefreshCcw className="text-blue-500" />} title="Solicitar Reembolso" color="bg-blue-50" 
               onClick={() => { 
                 if (pedidos.length === 0) {
-                  // AGORA ABRE O MODAL CENTRAL ESTILOSO
+                  // AVISO ESTILOSO
                   setIsAlertPedidoOpen(true);
                   registrarLog('Tentou pedir Reembolso', 'Bloqueado no início: Nenhum pedido ativo.');
                 } else {
@@ -280,7 +280,7 @@ export default function Dashboard() {
         </button>
       </nav>
 
-      {/* ---> NOVO MODAL ESTILOSO: AVISO SEM PEDIDO <--- */}
+      {/* ---> MODAL ESTILOSO COM TEXTO ALTERADO <--- */}
       {isAlertPedidoOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl w-full max-w-sm p-8 relative shadow-2xl animate-in zoom-in duration-200 text-center flex flex-col items-center">
@@ -292,7 +292,7 @@ export default function Dashboard() {
             </div>
             <h2 className="text-2xl font-black text-gray-900 mb-2">Ação Inválida</h2>
             <p className="text-gray-500 text-sm font-medium mb-8 leading-relaxed">
-              Só é possível solicitar reembolso caso haja algum <strong className="text-gray-800">pedido ativo</strong> na sua conta.
+              Só é possível solicitar reembolso caso haja algum <strong className="text-gray-800">PAGAMENTO CONCLUÍDO</strong> na sua conta.
             </p>
             <button 
               onClick={() => setIsAlertPedidoOpen(false)} 
