@@ -30,7 +30,7 @@ export default function Dashboard() {
   
   const navigate = useNavigate();
 
-  // ---> NOVA FUNÇÃO: O ESPIÃO DE ATIVIDADES <---
+  // O ESPIÃO DE ATIVIDADES
   const registrarLog = async (acao: string, detalhes: string = '') => {
     if (!user) return;
     try {
@@ -107,6 +107,9 @@ export default function Dashboard() {
   };
 
   const abrirPagamento = (pedido: any) => {
+    // ---> TRAVA DE SEGURANÇA AQUI <---
+    if (pedido.status === 'pago') return; 
+
     if (!pedido.pix_copia_cola) {
       return toast.info("Aguarde. O administrador ainda está gerando sua cobrança.");
     }
@@ -228,8 +231,10 @@ export default function Dashboard() {
                       <h4 className="font-black text-gray-900 text-sm">{p.produto}</h4>
                       <p className="text-green-600 font-black text-xl">R$ {p.valor}</p>
                     </div>
+                    {/* ---> O BOTÃO AGORA DESLIGA SE ESTIVER PAGO (disabled) <--- */}
                     <button 
                       onClick={() => abrirPagamento(p)}
+                      disabled={p.status === 'pago'}
                       className={`px-8 py-3 rounded-xl font-black text-sm transition-all w-full md:w-auto ${p.status === 'pago' ? 'bg-green-50 text-green-600 cursor-default' : 'bg-[#4ade80] hover:bg-[#22c55e] text-white shadow-lg active:scale-95'}`}
                     >
                       {p.status === 'pago' ? 'PAGAMENTO CONCLUÍDO' : 'PAGAR AGORA'}
