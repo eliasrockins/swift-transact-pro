@@ -148,7 +148,7 @@ export default function Dashboard() {
       <main className="flex-1 p-4 md:p-8 overflow-y-auto pb-24 md:pb-8 relative">
         <div className="md:hidden flex justify-between items-center mb-8 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
           <img src={logo} alt="Ck Soluções" className="h-10 w-auto object-contain" />
-          <button onClick={handleLogout} className="flex items-center gap-2 bg-red-50 text-red-500 px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-widest active:scale-95 transition-all">
+          <button onClick={handleLogout} className="flex items-center gap-2 bg-red-50 text-red-500 px-4 py-2 rounded-xl font-bold text-xs uppercase trackingest active:scale-95 transition-all">
             <LogOut size={16} /> Sair
           </button>
         </div>
@@ -197,7 +197,7 @@ export default function Dashboard() {
             ) : (
               <div className="grid grid-cols-1 gap-4">
                 {pedidos.map((p) => (
-                  <div key={p.id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+                  <div key={p.id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4 hover:shadow-md transition-shadow">
                     <div className="text-center md:text-left flex flex-col gap-1 w-full md:w-auto">
                       <span className="inline-block bg-purple-50 text-purple-700 border border-purple-100 text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-widest w-fit mx-auto md:mx-0 mb-1">
                         CÓDIGO: {perfil?.codigo_cobranca || 'NÃO INFORMADO'}
@@ -206,25 +206,32 @@ export default function Dashboard() {
                       <p className="text-green-600 font-black text-xl">R$ {p.valor}</p>
                     </div>
                     
-                    {/* ---> AQUI ESTÁ A MÁGICA: AGRUPAMENTO DE BOTÕES <--- */}
+                    {/* AGRUPAMENTO DE BOTÕES */}
                     <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto mt-2 md:mt-0">
                       
-                      {/* BOTÃO DE REEMBOLSO APARECE SE O STATUS FOR PAGO */}
+                      {/* ---> NOVO "MINI CARD" DE REEMBOLSO (COM A ESTÉTICA PEDIDA) <--- */}
                       {p.status === 'pago' && (
-                        <button 
+                        <div 
                           onClick={() => { 
                             setIsReembolsoOpen(true); 
                             registrarLog('Clicou em Reembolso', `Via histórico no pedido: ${p.produto}`); 
                           }}
-                          className="px-6 py-3 rounded-xl font-black text-sm transition-all w-full md:w-auto bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100 active:scale-95 whitespace-nowrap"
+                          className="w-full md:w-auto flex items-center gap-3 p-3 bg-blue-50 border border-blue-100 rounded-xl cursor-pointer hover:bg-blue-100 hover:border-blue-200 transition-all active:scale-95 whitespace-nowrap group"
                         >
-                          SOLICITAR REEMBOLSO
-                        </button>
+                          {/* Ícone box (igual ao card de cima) */}
+                          <div className="p-2 bg-white rounded-lg text-blue-500 border border-blue-100 group-hover:border-blue-200">
+                             <RefreshCcw size={16} />
+                          </div>
+                          {/* Texto (mesmo estilo do print) */}
+                          <span className="font-black text-blue-700 text-xs">Solicitar Reembolso</span>
+                          {/* Seta (igual ao card de cima) */}
+                          <ChevronRight size={16} className="text-blue-300 ml-auto md:ml-0 group-hover:text-blue-500 transform group-hover:translate-x-0.5 transition-all" />
+                        </div>
                       )}
 
                       <button 
                         onClick={() => abrirPagamento(p)} disabled={p.status === 'pago'}
-                        className={`px-8 py-3 rounded-xl font-black text-sm transition-all w-full md:w-auto whitespace-nowrap ${p.status === 'pago' ? 'bg-green-50 text-green-600 cursor-default border border-green-100' : 'bg-[#4ade80] hover:bg-[#22c55e] text-white shadow-lg active:scale-95'}`}
+                        className={`px-8 py-3 rounded-xl font-black text-sm transition-all w-full md:w-auto whitespace-nowrap h-[50px] ${p.status === 'pago' ? 'bg-green-50 text-green-600 cursor-default border border-green-100' : 'bg-[#4ade80] hover:bg-[#22c55e] text-white shadow-lg active:scale-95'}`}
                       >
                         {p.status === 'pago' ? 'PAGAMENTO CONCLUÍDO' : 'PAGAR AGORA'}
                       </button>
@@ -253,6 +260,7 @@ export default function Dashboard() {
         )}
       </main>
 
+      {/* MENU INFERIOR MOBILE */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-gray-200 flex justify-around p-2 z-40 pb-safe">
         <button onClick={() => { setAbaAtiva('inicio'); registrarLog('Acessou: Início', 'Navegou pelo menu celular.'); }} className={`flex flex-col items-center gap-1 p-2 w-full transition-all ${abaAtiva === 'inicio' ? 'text-blue-600 scale-110' : 'text-gray-400'}`}>
           <LayoutDashboard size={22} /><span className="text-[10px] font-bold">Início</span>
