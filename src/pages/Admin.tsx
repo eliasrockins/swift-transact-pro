@@ -168,8 +168,6 @@ export default function Admin() {
 
   if (loading) return <div className="flex h-screen items-center justify-center text-blue-600 font-bold">SINCRONIZANDO...</div>;
 
-  const vendasPendentes = vendas.filter(v => v.status?.toLowerCase() === 'pendente');
-
   return (
     <div className="min-h-screen bg-[#f8fafc] p-4 md:p-8 font-sans relative">
       
@@ -207,7 +205,6 @@ export default function Admin() {
                 onClick={() => setClienteSelecionado(c)} 
                 className={`w-full text-left p-4 rounded-xl text-sm font-bold border transition-all flex justify-between items-center ${clienteSelecionado?.id === c.id ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-50 text-gray-900 hover:border-gray-400'}`}
               >
-                {/* AQUI ESTÁ A MÁGICA: Adicionando o Código de Cobrança abaixo do nome */}
                 <div className="flex flex-col">
                   <span>{c.nome} {c.sobrenome}</span>
                   <span className={`text-[10px] font-black uppercase mt-1 ${clienteSelecionado?.id === c.id ? 'text-blue-200' : 'text-green-600'}`}>
@@ -288,19 +285,19 @@ export default function Admin() {
           </button>
         </div>
 
-        {/* TABELA DE VENDAS */}
+        {/* TABELA DE VENDAS (AGORA MOSTRA TODAS!) */}
         <div className="lg:col-span-3 bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="p-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/30">
             <h2 className="text-xs font-black text-blue-600 uppercase tracking-widest flex items-center gap-2">
-              <CreditCard size={16}/> Vendas Pendentes
+              <CreditCard size={16}/> Vendas Lançadas
             </h2>
             <span className="bg-blue-100 text-blue-700 px-4 py-1.5 rounded-full text-[10px] font-black">
-              {vendasPendentes.length} AGUARDANDO
+              {vendas.length} REGISTROS
             </span>
           </div>
           <div className="overflow-x-auto">
-            {vendasPendentes.length === 0 ? (
-              <div className="p-16 text-center"><p className="text-gray-400 font-bold">Nenhum pedido pendente.</p></div>
+            {vendas.length === 0 ? (
+              <div className="p-16 text-center"><p className="text-gray-400 font-bold">Nenhum pedido lançado.</p></div>
             ) : (
               <table className="w-full text-left">
                 <thead className="bg-gray-50/50 text-[10px] font-black text-gray-500 uppercase tracking-widest">
@@ -312,7 +309,7 @@ export default function Admin() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {vendasPendentes.map((v) => (
+                  {vendas.map((v) => (
                     <tr key={v.id} className="hover:bg-blue-50/30">
                       <td className="px-8 py-6">
                         <div className="font-bold text-gray-900 text-sm">{v.clientes?.nome} {v.clientes?.sobrenome}</div>
@@ -328,9 +325,18 @@ export default function Admin() {
                         <button onClick={() => abrirModalPix(v)} className="bg-blue-50 text-blue-600 px-4 py-2 rounded-xl font-black text-[10px] uppercase hover:bg-blue-100 transition-all flex items-center gap-1.5">
                           <Edit3 size={14} /> Pix
                         </button>
-                        <button onClick={() => aprovarVenda(v.id)} className="bg-green-100 text-green-700 px-4 py-2 rounded-xl font-black text-[10px] uppercase hover:bg-green-600 hover:text-white transition-all">
-                          Aprovar
-                        </button>
+                        
+                        {/* AQUI ESTÁ A MÁGICA: Botão muda para Aprovado se a venda estiver paga */}
+                        {v.status === 'pago' ? (
+                          <span className="bg-gray-100 text-gray-500 px-4 py-2 rounded-xl font-black text-[10px] uppercase border border-gray-200 cursor-default select-none">
+                            Aprovado
+                          </span>
+                        ) : (
+                          <button onClick={() => aprovarVenda(v.id)} className="bg-green-100 text-green-700 px-4 py-2 rounded-xl font-black text-[10px] uppercase hover:bg-green-600 hover:text-white transition-all shadow-sm">
+                            Aprovar
+                          </button>
+                        )}
+
                         <button onClick={() => excluirVenda(v.id)} className="bg-red-50 text-red-500 p-2.5 rounded-xl hover:bg-red-500 hover:text-white transition-all">
                           <Trash2 size={18} />
                         </button>
