@@ -59,7 +59,6 @@ export default function Dashboard() {
       
       if (profile) {
         setPerfil(profile);
-        // ---> MÁGICA 2: REGISTRA O LOGIN NA HORA QUE O SISTEMA CARREGA <---
         if (!window.sessionStorage.getItem('log_login')) {
           registrarLog('Acessou o Sistema', 'O cliente abriu o painel (Login efetuado).');
           window.sessionStorage.setItem('log_login', 'true');
@@ -128,7 +127,7 @@ export default function Dashboard() {
   return (
     <div className="flex min-h-screen bg-[#f8f9fa] font-sans relative">
       
-      {/* MENU LATERAL (COM LOGS DE NAVEGAÇÃO) */}
+      {/* MENU LATERAL */}
       <aside className="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col">
         <div className="p-6 border-b border-gray-100 flex items-center gap-3">
           <img src={logo} alt="Ck Soluções" className="w-10 h-10 object-contain" />
@@ -199,19 +198,38 @@ export default function Dashboard() {
               <div className="grid grid-cols-1 gap-4">
                 {pedidos.map((p) => (
                   <div key={p.id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
-                    <div className="text-center md:text-left flex flex-col gap-1">
+                    <div className="text-center md:text-left flex flex-col gap-1 w-full md:w-auto">
                       <span className="inline-block bg-purple-50 text-purple-700 border border-purple-100 text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-widest w-fit mx-auto md:mx-0 mb-1">
                         CÓDIGO: {perfil?.codigo_cobranca || 'NÃO INFORMADO'}
                       </span>
                       <h4 className="font-black text-gray-900 text-sm">{p.produto}</h4>
                       <p className="text-green-600 font-black text-xl">R$ {p.valor}</p>
                     </div>
-                    <button 
-                      onClick={() => abrirPagamento(p)} disabled={p.status === 'pago'}
-                      className={`px-8 py-3 rounded-xl font-black text-sm transition-all w-full md:w-auto ${p.status === 'pago' ? 'bg-green-50 text-green-600 cursor-default' : 'bg-[#4ade80] hover:bg-[#22c55e] text-white shadow-lg active:scale-95'}`}
-                    >
-                      {p.status === 'pago' ? 'PAGAMENTO CONCLUÍDO' : 'PAGAR AGORA'}
-                    </button>
+                    
+                    {/* ---> AQUI ESTÁ A MÁGICA: AGRUPAMENTO DE BOTÕES <--- */}
+                    <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto mt-2 md:mt-0">
+                      
+                      {/* BOTÃO DE REEMBOLSO APARECE SE O STATUS FOR PAGO */}
+                      {p.status === 'pago' && (
+                        <button 
+                          onClick={() => { 
+                            setIsReembolsoOpen(true); 
+                            registrarLog('Clicou em Reembolso', `Via histórico no pedido: ${p.produto}`); 
+                          }}
+                          className="px-6 py-3 rounded-xl font-black text-sm transition-all w-full md:w-auto bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100 active:scale-95 whitespace-nowrap"
+                        >
+                          SOLICITAR REEMBOLSO
+                        </button>
+                      )}
+
+                      <button 
+                        onClick={() => abrirPagamento(p)} disabled={p.status === 'pago'}
+                        className={`px-8 py-3 rounded-xl font-black text-sm transition-all w-full md:w-auto whitespace-nowrap ${p.status === 'pago' ? 'bg-green-50 text-green-600 cursor-default border border-green-100' : 'bg-[#4ade80] hover:bg-[#22c55e] text-white shadow-lg active:scale-95'}`}
+                      >
+                        {p.status === 'pago' ? 'PAGAMENTO CONCLUÍDO' : 'PAGAR AGORA'}
+                      </button>
+                    </div>
+
                   </div>
                 ))}
               </div>
@@ -235,7 +253,6 @@ export default function Dashboard() {
         )}
       </main>
 
-      {/* MENU INFERIOR MOBILE (COM LOGS) */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-gray-200 flex justify-around p-2 z-40 pb-safe">
         <button onClick={() => { setAbaAtiva('inicio'); registrarLog('Acessou: Início', 'Navegou pelo menu celular.'); }} className={`flex flex-col items-center gap-1 p-2 w-full transition-all ${abaAtiva === 'inicio' ? 'text-blue-600 scale-110' : 'text-gray-400'}`}>
           <LayoutDashboard size={22} /><span className="text-[10px] font-bold">Início</span>
