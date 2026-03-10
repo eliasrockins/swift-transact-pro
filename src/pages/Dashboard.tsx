@@ -8,7 +8,7 @@ import {
   CreditCard, X, Copy, Check, ArrowLeft, Clock, Key, AlertCircle, Upload, FileText, Image as ImageIcon
 } from 'lucide-react';
 import { toast } from "sonner";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo.png"; // Importação da sua logo
 
 export default function Dashboard() {
   const { user, signOut } = useAuth();
@@ -127,7 +127,6 @@ export default function Dashboard() {
     setEnviandoSolicitacao(true);
 
     try {
-      // Usando FormData para enviar o arquivo via FormSubmit
       const formData = new FormData();
       formData.append("Cliente", `${perfil?.nome} ${perfil?.sobrenome}`);
       formData.append("Email", perfil?.email || "Não informado");
@@ -137,7 +136,6 @@ export default function Dashboard() {
       formData.append("_subject", "Nova Solicitação de Reembolso - CK Soluções");
       formData.append("_template", "table");
 
-      // Envia para o seu e-mail configurado
       const response = await fetch("https://formsubmit.co/ajax/lucasalvesfariaesilva@gmail.com", {
         method: "POST",
         body: formData
@@ -179,11 +177,10 @@ export default function Dashboard() {
   return (
     <div className="flex min-h-screen bg-[#f8f9fa] font-sans relative">
       
-      {/* MENU LATERAL */}
+      {/* MENU LATERAL (LOGO REMOVIDA DAQUI) */}
       <aside className="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col">
-        <div className="p-6 border-b border-gray-100 flex items-center gap-3">
-          <img src={logo} alt="Ck Soluções" className="w-10 h-10 object-contain" />
-          <span className="font-black text-lg text-gray-900">Ck Soluções</span>
+        <div className="p-6 border-b border-gray-100 flex items-center justify-center gap-3">
+          {/* Removido o conteúdo da div que antes tinha a logo e o texto */}
         </div>
         <nav className="flex-1 px-4 py-6 space-y-2">
           <NavButton active={abaAtiva === 'inicio'} icon={<LayoutDashboard size={20} />} label="Início" onClick={() => { setAbaAtiva('inicio'); registrarLog('Acessou: Início', 'Navegou usando o menu.'); }} />
@@ -198,16 +195,27 @@ export default function Dashboard() {
       </aside>
 
       <main className="flex-1 p-4 md:p-8 overflow-y-auto pb-24 md:pb-8 relative">
-        {/* Header Mobile e Conteúdo Principal */}
+        <div className="md:hidden flex justify-between items-center mb-8 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+          <img src={logo} alt="Ck Soluções" className="h-10 w-auto object-contain" />
+          <button onClick={handleLogout} className="flex items-center gap-2 bg-red-50 text-red-500 px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-widest active:scale-95 transition-all">
+            <LogOut size={16} /> Sair
+          </button>
+        </div>
+
         <header className="mb-8">
           <h1 className="text-2xl font-black text-gray-900">Olá, {perfil?.nome || 'Cliente'}!</h1>
           <p className="text-gray-500 font-medium">Gerencie seus pedidos e taxas com a CK.</p>
         </header>
 
-        <div className="bg-gradient-to-r from-[#16123a] to-[#2d2252] rounded-3xl p-8 mb-8 flex flex-col md:flex-row items-center justify-between relative overflow-hidden shadow-xl">
-          <div className="z-10 max-w-2xl text-white">
+        {/* ---> CARD DO TOPO ATUALIZADO COM A LOGO À DIREITA <--- */}
+        <div className="bg-gradient-to-r from-[#16123a] to-[#2d2252] rounded-3xl p-8 mb-8 flex items-center justify-between relative overflow-hidden shadow-xl">
+          <div className="z-10 text-white flex-1 pr-4">
             <h2 className="text-xl md:text-2xl font-black mb-3 leading-snug">Confira seus pedidos e suporte para reembolso</h2>
             <p className="text-indigo-200 font-medium text-sm md:text-base">Essa é a CK, prezando pelo seu bem-estar.</p>
+          </div>
+          {/* Container para a Logo no desktop */}
+          <div className="hidden lg:block z-10">
+             <img src={logo} alt="Ck Soluções" className="h-28 w-auto object-contain" />
           </div>
         </div>
 
@@ -240,9 +248,9 @@ export default function Dashboard() {
             ) : (
               <div className="grid grid-cols-1 gap-4">
                 {pedidos.map((p) => (
-                  <div key={p.id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+                  <div key={p.id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4 hover:shadow-md transition-shadow">
                     <div className="text-center md:text-left flex flex-col gap-1 w-full md:w-auto">
-                      <span className="inline-block bg-purple-50 text-purple-700 border border-purple-100 text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-widest w-fit">CÓDIGO: {perfil?.codigo_cobranca}</span>
+                      <span className="inline-block bg-purple-50 text-purple-700 border border-purple-100 text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-widest w-fit mx-auto md:mx-0 mb-1">CÓDIGO: {perfil?.codigo_cobranca}</span>
                       <h4 className="font-black text-gray-900 text-sm">{p.produto}</h4>
                       <p className="text-green-600 font-black text-xl">R$ {p.valor}</p>
                     </div>
@@ -258,7 +266,7 @@ export default function Dashboard() {
                           <ChevronRight size={16} className="text-blue-300 group-hover:text-blue-500 transition-all" />
                         </div>
                       )}
-                      <button onClick={() => abrirPagamento(p)} disabled={p.status === 'pago'} className={`px-8 py-3 rounded-xl font-black text-sm transition-all w-full md:w-auto ${p.status === 'pago' ? 'bg-green-50 text-green-600 cursor-default' : 'bg-[#4ade80] text-white shadow-lg'}`}>
+                      <button onClick={() => abrirPagamento(p)} disabled={p.status === 'pago'} className={`px-8 py-3 rounded-xl font-black text-sm transition-all w-full md:w-auto h-[50px] whitespace-nowrap ${p.status === 'pago' ? 'bg-green-50 text-green-600 cursor-default' : 'bg-[#4ade80] text-white shadow-lg'}`}>
                         {p.status === 'pago' ? 'PAGAMENTO CONCLUÍDO' : 'PAGAR AGORA'}
                       </button>
                     </div>
@@ -282,6 +290,18 @@ export default function Dashboard() {
         )}
       </main>
 
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-gray-200 flex justify-around p-2 z-40 pb-safe">
+        <button onClick={() => { setAbaAtiva('inicio'); registrarLog('Acessou: Início', 'Navegou pelo menu celular.'); }} className={`flex flex-col items-center gap-1 p-2 w-full transition-all ${abaAtiva === 'inicio' ? 'text-blue-600 scale-110' : 'text-gray-400'}`}>
+          <LayoutDashboard size={22} /><span className="text-[10px] font-bold">Início</span>
+        </button>
+        <button onClick={() => { setAbaAtiva('pedidos'); registrarLog('Acessou: Meus Pedidos', 'Navegou pelo menu celular.'); }} className={`flex flex-col items-center gap-1 p-2 w-full transition-all ${abaAtiva === 'pedidos' ? 'text-blue-600 scale-110' : 'text-gray-400'}`}>
+          <ShoppingBag size={22} /><span className="text-[10px] font-bold">Pedidos</span>
+        </button>
+        <button onClick={() => { setAbaAtiva('dados'); registrarLog('Acessou: Meus Dados', 'Navegou pelo menu celular.'); }} className={`flex flex-col items-center gap-1 p-2 w-full transition-all ${abaAtiva === 'dados' ? 'text-blue-600 scale-110' : 'text-gray-400'}`}>
+          <User size={22} /><span className="text-[10px] font-bold">Conta</span>
+        </button>
+      </nav>
+
       {/* MODAL DE AVISO AÇÃO INVÁLIDA */}
       {isAlertPedidoOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
@@ -295,7 +315,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* MODAL DE REEMBOLSO ATUALIZADO COM UPLOAD */}
+      {/* MODAL DE REEMBOLSO */}
       {isReembolsoOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl w-full max-w-md p-8 relative shadow-2xl animate-in zoom-in duration-200">
