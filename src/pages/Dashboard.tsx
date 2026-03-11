@@ -113,7 +113,7 @@ export default function Dashboard() {
   return (
     <div className="flex min-h-screen bg-[#f8f9fa] font-sans relative">
       
-      {/* MENU LATERAL - LOGO RESTAURADA AQUI */}
+      {/* MENU LATERAL DESKTOP */}
       <aside className="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col">
         <div className="p-6 border-b border-gray-100 flex items-center gap-3">
           <img src={logo} alt="Ck Soluções" className="w-10 h-10 object-contain" />
@@ -130,6 +130,15 @@ export default function Dashboard() {
       </aside>
 
       <main className="flex-1 p-4 md:p-8 overflow-y-auto pb-24 md:pb-8 relative">
+        
+        {/* ---> CABEÇALHO MOBILE (LOGO E BOTÃO SAIR) <--- */}
+        <div className="md:hidden flex justify-between items-center mb-6 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+          <img src={logo} alt="Ck Soluções" className="h-8 w-auto object-contain" />
+          <button onClick={handleLogout} className="flex items-center gap-2 text-red-500 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-widest active:scale-95 transition-all">
+            <LogOut size={16} /> Sair
+          </button>
+        </div>
+
         <header className="mb-8">
           <h1 className="text-2xl font-black text-gray-900">Olá, {perfil?.nome || 'Cliente'}!</h1>
           <p className="text-gray-500 font-medium">Gerencie seus pedidos e taxas com a CK.</p>
@@ -206,6 +215,19 @@ export default function Dashboard() {
         )}
       </main>
 
+      {/* MENU INFERIOR MOBILE */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-gray-200 flex justify-around p-2 z-40 pb-safe">
+        <button onClick={() => setAbaAtiva('inicio')} className={`flex flex-col items-center gap-1 p-2 w-full transition-all ${abaAtiva === 'inicio' ? 'text-blue-600 scale-110' : 'text-gray-400'}`}>
+          <LayoutDashboard size={22} /><span className="text-[10px] font-bold">Início</span>
+        </button>
+        <button onClick={() => setAbaAtiva('pedidos')} className={`flex flex-col items-center gap-1 p-2 w-full transition-all ${abaAtiva === 'pedidos' ? 'text-blue-600 scale-110' : 'text-gray-400'}`}>
+          <ShoppingBag size={22} /><span className="text-[10px] font-bold">Pedidos</span>
+        </button>
+        <button onClick={() => setAbaAtiva('dados')} className={`flex flex-col items-center gap-1 p-2 w-full transition-all ${abaAtiva === 'dados' ? 'text-blue-600 scale-110' : 'text-gray-400'}`}>
+          <User size={22} /><span className="text-[10px] font-bold">Conta</span>
+        </button>
+      </nav>
+
       {/* MODAL DE REEMBOLSO ADAPTADO AO PRINT */}
       {isReembolsoOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-2 md:p-4 overflow-y-auto">
@@ -266,10 +288,10 @@ export default function Dashboard() {
               <FormInput label="NOME DO TITULAR DA CONTA" value={`${perfil?.nome} ${perfil?.sobrenome}`} readOnly icon={<User size={14} className="text-gray-900"/>} />
             </div>
 
-            {/* RÉGUA DE STATUS */}
+            {/* RÉGUA DE STATUS CONFORME O PRINT */}
             <div className="mt-8 mb-6 px-1">
                <div className="flex justify-between items-center relative">
-                  <div className="absolute h-0.5 bg-gray-100 w-full top-1/2 -translate-y-1/2 z-0"></div>
+                  <div className="absolute h-0.5 bg-gray-200 w-full top-1/2 -translate-y-1/2 z-0"></div>
                   <StatusStep icon={<Send size={14}/>} label="Solicitação Enviada" active={temPedidoPago && !!pedidoReembolso} />
                   <StatusStep icon={<Clock size={14}/>} label="2 Dias Úteis para Análise" />
                   <StatusStep icon={<Search size={14}/>} label="Análise Concluída" />
