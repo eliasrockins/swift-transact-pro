@@ -44,7 +44,7 @@ Link de Pay
             transition={{ duration: 0.6, delay: 0.1 }}
               className="text-5xl md:text-7xl font-heading font-bold leading-tight mb-6"
             >
-              CK Soluções inteligentes{" "}
+              Link de Pay inteligentes{" "}
             <span className="text-gradient">para o seu negócio</span>
           </motion.h1>
 
