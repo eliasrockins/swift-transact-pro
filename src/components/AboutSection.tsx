@@ -52,7 +52,7 @@ const testimonials = [
   {
     name: "Ana Ruas",
     role: "Professora",
-    text: "Estou extremamente satisfeita com a minha experiência ao usar a CK Soluções. Fiquei impressionada com a rapidez com que recebi meu produto após a compra. Além disso, fiquei tranquila sabendo que o pagamento estava protegido durante todo o processo.",
+    text: "Estou extremamente satisfeita com a minha experiência ao usar a Link de Pay. Fiquei impressionada com a rapidez com que recebi meu produto após a compra. Além disso, fiquei tranquila sabendo que o pagamento estava protegido durante todo o processo.",
   },
   {
     name: "Suzana Bertolaccini",
