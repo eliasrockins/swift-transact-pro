@@ -16,7 +16,7 @@ const testimonials = [
     name: "Ana Ruas",
     role: "Professora",
     image: testimonialAna,
-    text: "Estou extremamente satisfeita com a minha experiência ao usar a Link de Pay. Fiquei impressionada com a rapidez com que recebi meu produto após a compra. Além disso, fiquei tranquila sabendo que o pagamento estava protegido durante todo o processo. Recomendo a Link de Pay. a todos os que procuram uma plataforma confiável e eficiente para suas compras online",
+    text: "Estou extremamente satisfeita com a minha experiência ao usar a Link de Pay. Fiquei impressionada com a rapidez com que recebi meu produto após a compra. Além disso, fiquei tranquila sabendo que o pagamento estava protegido durante todo o processo. Recomendo a Link de Pay a todos os que procuram uma plataforma confiável e eficiente para suas compras online",
   },
   {
     name: "Suzana Bertolaccini",
