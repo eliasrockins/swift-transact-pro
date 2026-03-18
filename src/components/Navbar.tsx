@@ -7,14 +7,14 @@ import { useAuth } from "@/contexts/AuthContext";
 import logo from "@/assets/logo.png";
 
 const navItems = [
-  { label: "Página Inicial", href: "/" },
-  { label: "Sobre Nós", href: "/sobre-nos" },
-  { label: "Soluções", href: "/solucoes" },
-  { label: "Assinaturas", href: "/assinaturas" },
-  { label: "Depoimentos", href: "/depoimentos" },
-  { label: "FAQ", href: "/faq" },
-  { label: "Contato", href: "/contato" },
-];
+{ label: "Página Inicial", href: "/" },
+{ label: "Sobre Nós", href: "/sobre-nos" },
+{ label: "Soluções", href: "/solucoes" },
+{ label: "Assinaturas", href: "/assinaturas" },
+{ label: "Depoimentos", href: "/depoimentos" },
+{ label: "FAQ", href: "/faq" },
+{ label: "Contato", href: "/contato" }];
+
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -28,26 +28,26 @@ const Navbar = () => {
       <div className="container mx-auto px-6 py-4 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
           <img src={logo} alt="CK Soluções" className="w-10 h-10" />
-          <span className="font-heading font-bold text-xl text-white">
-            CK Soluções
+          <span className="font-heading font-bold text-xl text-white">Link de Pay
+
           </span>
         </Link>
 
         {/* Desktop Nav */}
         <div className="hidden lg:flex items-center gap-8">
-          {navItems.map((item) => (
-            <Link
-              key={item.label}
-              to={item.href}
-              className={`text-sm transition-colors ${
-                location.pathname === item.href
-                  ? "text-primary font-bold"
-                  : "text-white font-medium hover:text-primary"
-              }`}
-            >
+          {navItems.map((item) =>
+          <Link
+            key={item.label}
+            to={item.href}
+            className={`text-sm transition-colors ${
+            location.pathname === item.href ?
+            "text-primary font-bold" :
+            "text-white font-medium hover:text-primary"}`
+            }>
+            
               {item.label}
             </Link>
-          ))}
+          )}
         </div>
 
         <div className="hidden lg:flex items-center gap-3">
@@ -62,36 +62,36 @@ const Navbar = () => {
         {/* Mobile Toggle */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="lg:hidden text-white"
-        >
+          className="lg:hidden text-white">
+          
           {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
 
       {/* Mobile Menu */}
       <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden glass border-t border-border/50 overflow-hidden bg-[#0D0D1A]/95"
-          >
+        {isOpen &&
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          exit={{ opacity: 0, height: 0 }}
+          className="lg:hidden glass border-t border-border/50 overflow-hidden bg-[#0D0D1A]/95">
+          
             <div className="container mx-auto px-6 py-4 flex flex-col gap-4">
-              {navItems.map((item) => (
-                <Link
-                  key={item.label}
-                  to={item.href}
-                  onClick={() => setIsOpen(false)}
-                  className={`transition-colors py-2 ${
-                    location.pathname === item.href
-                      ? "text-primary font-bold"
-                      : "text-white font-medium hover:text-primary"
-                  }`}
-                >
+              {navItems.map((item) =>
+            <Link
+              key={item.label}
+              to={item.href}
+              onClick={() => setIsOpen(false)}
+              className={`transition-colors py-2 ${
+              location.pathname === item.href ?
+              "text-primary font-bold" :
+              "text-white font-medium hover:text-primary"}`
+              }>
+              
                   {item.label}
                 </Link>
-              ))}
+            )}
               <Link to={authLink} onClick={() => setIsOpen(false)}>
                 <Button variant="ghost" size="sm" className="justify-start gap-2 w-full text-white hover:text-primary hover:bg-white/10">
                   <User className="w-4 h-4" />
@@ -100,10 +100,10 @@ const Navbar = () => {
               </Link>
             </div>
           </motion.div>
-        )}
+        }
       </AnimatePresence>
-    </nav>
-  );
+    </nav>);
+
 };
 
 export default Navbar;
