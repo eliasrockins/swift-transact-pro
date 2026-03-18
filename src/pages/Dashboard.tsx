@@ -143,16 +143,17 @@ export default function Dashboard() {
 
         <header className="mb-8">
           <h1 className="text-2xl font-black text-gray-900">Olá, {perfil?.nome || 'Cliente'}!</h1>
-          {/* ---> TEXTO ALTERADO PARA LINK DE PAY <--- */}
+          {/* NOME CORRIGIDO AQUI */}
           <p className="text-gray-500 font-medium">Gerencie seus pedidos e taxas com a Link de Pay.</p>
         </header>
 
         <div className="bg-gradient-to-r from-[#16123a] to-[#2d2252] rounded-3xl p-8 mb-8 flex items-center justify-between relative overflow-hidden shadow-xl">
           <div className="z-10 text-white flex-1 pr-4">
             <h2 className="text-xl md:text-2xl font-black mb-3 leading-snug">Confira seus pedidos e suporte para reembolso</h2>
-            {/* ---> TEXTO ALTERADO PARA LINK DE PAY <--- */}
+            {/* NOME CORRIGIDO AQUI */}
             <p className="text-indigo-200 font-medium text-sm md:text-base">Essa é a Link de Pay, prezando pelo seu bem-estar.</p>
           </div>
+          {/* ALT CORRIGIDO AQUI */}
           <div className="hidden lg:block z-10"><img src={logo} alt="Link de Pay" className="h-28 w-auto object-contain" /></div>
         </div>
 
