@@ -33,7 +33,9 @@ const HeroSection = () => {
             className="flex items-center gap-3 mb-8"
           >
             <img src={logo} alt="CK Soluções" className="w-16 h-16" />
-            <span className="text-2xl font-heading font-bold text-primary">CK Soluções</span>
+<span className="text-2xl font-heading font-bold text-primary">
+Link de Pay
+</span>
           </motion.div>
 
           <motion.h1
