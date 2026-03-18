@@ -9,7 +9,10 @@ import {
   Hash, Tag, HelpCircle, MessageSquare, Send, Search, Banknote, Lock
 } from 'lucide-react';
 import { toast } from "sonner";
-import logo from "@/assets/logo.png";
+
+// IMPORTANDO AS DUAS LOGOS
+import logo from "@/assets/logo.png"; // Logo original (mantida no resto do site)
+import logoB from "@/assets/logoB.png"; // Nova logo (usada apenas na barra lateral e menu mobile)
 
 export default function Dashboard() {
   const { user, signOut } = useAuth();
@@ -115,9 +118,9 @@ export default function Dashboard() {
       
       {/* MENU LATERAL DESKTOP */}
       <aside className="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col">
-        <div className="p-6 border-b border-gray-100 flex items-center gap-3">
-          <img src={logo} alt="Ck Soluções" className="w-10 h-10 object-contain" />
-          <span className="font-black text-lg text-gray-900">Ck Soluções</span>
+        <div className="p-6 border-b border-gray-100 flex items-center justify-center gap-3">
+          {/* ---> AQUI ENTRA A LOGO B (Alterado apenas aqui) <--- */}
+          <img src={logoB} alt="Link de Pay" className="h-10 w-auto object-contain" />
         </div>
         <nav className="flex-1 px-4 py-6 space-y-2">
           <NavButton active={abaAtiva === 'inicio'} icon={<LayoutDashboard size={20} />} label="Início" onClick={() => setAbaAtiva('inicio')} />
@@ -131,9 +134,10 @@ export default function Dashboard() {
 
       <main className="flex-1 p-4 md:p-8 overflow-y-auto pb-24 md:pb-8 relative">
         
-        {/* ---> CABEÇALHO MOBILE (LOGO E BOTÃO SAIR) <--- */}
+        {/* ---> CABEÇALHO MOBILE <--- */}
         <div className="md:hidden flex justify-between items-center mb-6 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-          <img src={logo} alt="Ck Soluções" className="h-8 w-auto object-contain" />
+          {/* A logo B também vai aqui, pois é o mesmo lugar da barra lateral só que na versão celular */}
+          <img src={logoB} alt="Link de Pay" className="h-8 w-auto object-contain" />
           <button onClick={handleLogout} className="flex items-center gap-2 text-red-500 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-widest active:scale-95 transition-all">
             <LogOut size={16} /> Sair
           </button>
@@ -149,6 +153,7 @@ export default function Dashboard() {
             <h2 className="text-xl md:text-2xl font-black mb-3 leading-snug">Confira seus pedidos e suporte para reembolso</h2>
             <p className="text-indigo-200 font-medium text-sm md:text-base">Essa é a CK, prezando pelo seu bem-estar.</p>
           </div>
+          {/* ---> AQUI CONTINUA A LOGO ORIGINAL (Logo do site todo) <--- */}
           <div className="hidden lg:block z-10"><img src={logo} alt="Ck Soluções" className="h-28 w-auto object-contain" /></div>
         </div>
 
