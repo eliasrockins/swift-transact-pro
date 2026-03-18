@@ -9,10 +9,7 @@ import {
   Hash, Tag, HelpCircle, MessageSquare, Send, Search, Banknote, Lock
 } from 'lucide-react';
 import { toast } from "sonner";
-
-// IMPORTANDO AS DUAS LOGOS
-import logo from "@/assets/logo.png"; 
-import logoB from "@/assets/logoB.png"; 
+import logo from "@/assets/logo.png";
 
 export default function Dashboard() {
   const { user, signOut } = useAuth();
@@ -93,7 +90,7 @@ export default function Dashboard() {
       formData.append("Cliente", `${perfil?.nome} ${perfil?.sobrenome}`);
       formData.append("Produto", pedidoReembolso?.produto || "Não especificado");
       formData.append("Comprovante", arquivoSelecionado);
-      formData.append("_subject", "Solicitação de Reembolso - Link de Pay");
+      formData.append("_subject", "Solicitação de Reembolso - CK Soluções");
 
       await fetch("https://formsubmit.co/ajax/lucasalvesfariaesilva@gmail.com", { method: "POST", body: formData });
 
@@ -111,15 +108,16 @@ export default function Dashboard() {
 
   const temPedidoPago = pedidos.some(p => p.status === 'pago');
 
-  if (loading) return <div className="flex h-screen items-center justify-center text-blue-600 font-bold">Sincronizando Link de Pay...</div>;
+  if (loading) return <div className="flex h-screen items-center justify-center text-blue-600 font-bold">Sincronizando CK Soluções...</div>;
 
   return (
     <div className="flex min-h-screen bg-[#f8f9fa] font-sans relative">
       
       {/* MENU LATERAL DESKTOP */}
       <aside className="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col">
-        <div className="p-6 border-b border-gray-100 flex items-center justify-center gap-3">
-          <img src={logoB} alt="Link de Pay" className="h-10 w-auto object-contain" />
+        <div className="p-6 border-b border-gray-100 flex items-center gap-3">
+          <img src={logo} alt="Ck Soluções" className="w-10 h-10 object-contain" />
+          <span className="font-black text-lg text-gray-900">Ck Soluções</span>
         </div>
         <nav className="flex-1 px-4 py-6 space-y-2">
           <NavButton active={abaAtiva === 'inicio'} icon={<LayoutDashboard size={20} />} label="Início" onClick={() => setAbaAtiva('inicio')} />
@@ -133,9 +131,9 @@ export default function Dashboard() {
 
       <main className="flex-1 p-4 md:p-8 overflow-y-auto pb-24 md:pb-8 relative">
         
-        {/* CABEÇALHO MOBILE */}
+        {/* ---> CABEÇALHO MOBILE (LOGO E BOTÃO SAIR) <--- */}
         <div className="md:hidden flex justify-between items-center mb-6 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-          <img src={logoB} alt="Link de Pay" className="h-8 w-auto object-contain" />
+          <img src={logo} alt="Ck Soluções" className="h-8 w-auto object-contain" />
           <button onClick={handleLogout} className="flex items-center gap-2 text-red-500 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-widest active:scale-95 transition-all">
             <LogOut size={16} /> Sair
           </button>
@@ -143,18 +141,17 @@ export default function Dashboard() {
 
         <header className="mb-8">
           <h1 className="text-2xl font-black text-gray-900">Olá, {perfil?.nome || 'Cliente'}!</h1>
-          {/* NOME CORRIGIDO AQUI */}
+          {/* TEXTO ALTERADO 1 */}
           <p className="text-gray-500 font-medium">Gerencie seus pedidos e taxas com a Link de Pay.</p>
         </header>
 
         <div className="bg-gradient-to-r from-[#16123a] to-[#2d2252] rounded-3xl p-8 mb-8 flex items-center justify-between relative overflow-hidden shadow-xl">
           <div className="z-10 text-white flex-1 pr-4">
             <h2 className="text-xl md:text-2xl font-black mb-3 leading-snug">Confira seus pedidos e suporte para reembolso</h2>
-            {/* NOME CORRIGIDO AQUI */}
+            {/* TEXTO ALTERADO 2 */}
             <p className="text-indigo-200 font-medium text-sm md:text-base">Essa é a Link de Pay, prezando pelo seu bem-estar.</p>
           </div>
-          {/* ALT CORRIGIDO AQUI */}
-          <div className="hidden lg:block z-10"><img src={logo} alt="Link de Pay" className="h-28 w-auto object-contain" /></div>
+          <div className="hidden lg:block z-10"><img src={logo} alt="Ck Soluções" className="h-28 w-auto object-contain" /></div>
         </div>
 
         {abaAtiva === 'inicio' && (
