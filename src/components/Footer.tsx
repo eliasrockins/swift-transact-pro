@@ -7,8 +7,8 @@ const Footer = () => {
       <div className="container mx-auto px-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <Link to="/" className="flex items-center gap-2">
-            <img src={logo} alt="CK Soluções" className="w-8 h-8" />
-            <span className="font-heading font-bold text-foreground">CK Soluções</span>
+            <img src={logo} alt="Link de Pay" className="w-8 h-8" />
+            <span className="font-heading font-bold text-foreground">Link de Pay</span>
           </Link>
 
           <div className="flex gap-8 text-sm text-muted-foreground">
@@ -20,7 +20,7 @@ const Footer = () => {
           </div>
 
           <p className="text-muted-foreground text-sm">
-            © 2026 CK Soluções. Todos os direitos reservados.
+            © 2026 Link de Pay. Todos os direitos reservados.
           </p>
         </div>
       </div>
