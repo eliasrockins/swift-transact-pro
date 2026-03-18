@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 
 const videos = [
-  { src: "/videos/depoimento-1.mov", poster: "/images/depoimento-1-poster.png" },
   { src: "/videos/depoimento-2.mp4", poster: "/images/depoimento-2-poster.png" },
   { src: "/videos/depoimento-3.mp4", poster: "/images/depoimento-3-poster.png" },
   { src: "/videos/depoimento-4.mp4", poster: "/images/depoimento-4-poster.png" },
@@ -27,7 +26,7 @@ const HomeVideoTestimonials = () => {
           </h2>
         </motion.div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           {videos.map((video, index) => (
             <motion.div
               key={index}
