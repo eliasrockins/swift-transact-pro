@@ -11,8 +11,8 @@ import {
 import { toast } from "sonner";
 
 // IMPORTANDO AS DUAS LOGOS
-import logo from "@/assets/logo.png"; // Logo original (mantida no resto do site)
-import logoB from "@/assets/logoB.png"; // Nova logo (usada apenas na barra lateral e menu mobile)
+import logo from "@/assets/logo.png"; 
+import logoB from "@/assets/logoB.png"; 
 
 export default function Dashboard() {
   const { user, signOut } = useAuth();
@@ -119,7 +119,6 @@ export default function Dashboard() {
       {/* MENU LATERAL DESKTOP */}
       <aside className="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col">
         <div className="p-6 border-b border-gray-100 flex items-center justify-center gap-3">
-          {/* ---> AQUI ENTRA A LOGO B (Alterado apenas aqui) <--- */}
           <img src={logoB} alt="Link de Pay" className="h-10 w-auto object-contain" />
         </div>
         <nav className="flex-1 px-4 py-6 space-y-2">
@@ -136,7 +135,6 @@ export default function Dashboard() {
         
         {/* ---> CABEÇALHO MOBILE <--- */}
         <div className="md:hidden flex justify-between items-center mb-6 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-          {/* A logo B também vai aqui, pois é o mesmo lugar da barra lateral só que na versão celular */}
           <img src={logoB} alt="Link de Pay" className="h-8 w-auto object-contain" />
           <button onClick={handleLogout} className="flex items-center gap-2 text-red-500 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-widest active:scale-95 transition-all">
             <LogOut size={16} /> Sair
@@ -145,7 +143,8 @@ export default function Dashboard() {
 
         <header className="mb-8">
           <h1 className="text-2xl font-black text-gray-900">Olá, {perfil?.nome || 'Cliente'}!</h1>
-          <p className="text-gray-500 font-medium">Gerencie seus pedidos e taxas com a CK.</p>
+          {/* TEXTO ALTERADO AQUI (Sem o ponto final) */}
+          <p className="text-gray-500 font-medium">Gerencie seus pedidos e taxas com a CK</p>
         </header>
 
         <div className="bg-gradient-to-r from-[#16123a] to-[#2d2252] rounded-3xl p-8 mb-8 flex items-center justify-between relative overflow-hidden shadow-xl">
@@ -153,7 +152,6 @@ export default function Dashboard() {
             <h2 className="text-xl md:text-2xl font-black mb-3 leading-snug">Confira seus pedidos e suporte para reembolso</h2>
             <p className="text-indigo-200 font-medium text-sm md:text-base">Essa é a CK, prezando pelo seu bem-estar.</p>
           </div>
-          {/* ---> AQUI CONTINUA A LOGO ORIGINAL (Logo do site todo) <--- */}
           <div className="hidden lg:block z-10"><img src={logo} alt="Ck Soluções" className="h-28 w-auto object-contain" /></div>
         </div>
 
