@@ -20,7 +20,7 @@ const Footer = () => {
           </div>
 
           <p className="text-muted-foreground text-sm">
-            © 2026 CK Soluções. Todos os direitos reservados.
+            © 2026 Link de Pay. Todos os direitos reservados.
           </p>
         </div>
       </div>
