@@ -88,7 +88,9 @@ const HomeTestimonialsCarousel = () => {
               </div>
 
               {/* Text */}
-              <p className="text-muted-foreground text-base leading-relaxed">
+<p className="text-muted-foreground text-base leading-relaxed">
+                {t.text}
+              </p>
                 {t.text}
               </p>
             </motion.div>
