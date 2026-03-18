@@ -10,7 +10,7 @@ const testimonials = [
     name: "Lucas A. Marini",
     role: "Advogado",
     image: testimonialLucas,
- text: "Minha experiência com a CK Soluções foi excepcional. Fiquei surpreso com a agilidade na entrega do meu pedido e com a qualidade do produto recebido. Além disso, o sistema de pagamento seguro me proporcionou tranquilidade durante toda a transação. Sem dúvida, continuarei utilizando a CK Soluções para minhas compras online e recomendo a todos que buscam praticidade e segurança",
+ text: "Minha experiência com a Link de Pay foi excepcional. Fiquei surpreso com a agilidade na entrega do meu pedido e com a qualidade do produto recebido. Além disso, o sistema de pagamento seguro me proporcionou tranquilidade durante toda a transação. Sem dúvida, continuarei utilizando a CK Soluções para minhas compras online e recomendo a todos que buscam praticidade e segurança",
   },
   {
     name: "Ana Ruas",
