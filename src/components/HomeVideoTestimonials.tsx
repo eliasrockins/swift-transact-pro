@@ -12,22 +12,6 @@ const HomeVideoTestimonials = () => {
   return (
     <section className="py-20">
       <div className="container mx-auto px-2 md:px-6">
-        {/* Vídeo decorativo */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="flex justify-center mb-10"
-        >
-          <video
-            src="/videos/depoimentos-bg.mov"
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="max-w-2xl w-full rounded-2xl relative z-10"
-          />
-        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
