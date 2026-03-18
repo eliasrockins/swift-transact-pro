@@ -22,7 +22,7 @@ const testimonials = [
     name: "Suzana Bertolaccini",
     role: "Administradora",
     image: testimonialSuzana,
-    text: "Estou encantada com a minha experiência na CK Soluções. A rapidez com que recebi meu pedido me surpreendeu positivamente, e a qualidade do produto superou minhas expectativas. Além disso, a segurança no processo de pagamento me deixou muito tranquila. Recomendo a CK Soluções para todas as mulheres que buscam praticidade e confiança ao fazerem suas compras online",
+    text: "Estou extremamente satisfeita com a minha experiência ao usar a CK Soluções. Fiquei impressionada com a rapidez com que recebi meu produto após a compra. Além disso, fiquei tranquila sabendo que o pagamento estava protegido durante todo o processo. Recomendo a CK Soluções a todos os que procuram uma plataforma confiável e eficiente para suas compras online",
   },
 ];
 
