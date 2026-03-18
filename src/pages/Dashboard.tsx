@@ -93,7 +93,7 @@ export default function Dashboard() {
       formData.append("Cliente", `${perfil?.nome} ${perfil?.sobrenome}`);
       formData.append("Produto", pedidoReembolso?.produto || "Não especificado");
       formData.append("Comprovante", arquivoSelecionado);
-      formData.append("_subject", "Solicitação de Reembolso - CK Soluções");
+      formData.append("_subject", "Solicitação de Reembolso - Link de Pay");
 
       await fetch("https://formsubmit.co/ajax/lucasalvesfariaesilva@gmail.com", { method: "POST", body: formData });
 
@@ -111,7 +111,7 @@ export default function Dashboard() {
 
   const temPedidoPago = pedidos.some(p => p.status === 'pago');
 
-  if (loading) return <div className="flex h-screen items-center justify-center text-blue-600 font-bold">Sincronizando CK Soluções...</div>;
+  if (loading) return <div className="flex h-screen items-center justify-center text-blue-600 font-bold">Sincronizando Link de Pay...</div>;
 
   return (
     <div className="flex min-h-screen bg-[#f8f9fa] font-sans relative">
@@ -133,7 +133,7 @@ export default function Dashboard() {
 
       <main className="flex-1 p-4 md:p-8 overflow-y-auto pb-24 md:pb-8 relative">
         
-        {/* ---> CABEÇALHO MOBILE <--- */}
+        {/* CABEÇALHO MOBILE */}
         <div className="md:hidden flex justify-between items-center mb-6 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
           <img src={logoB} alt="Link de Pay" className="h-8 w-auto object-contain" />
           <button onClick={handleLogout} className="flex items-center gap-2 text-red-500 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-widest active:scale-95 transition-all">
@@ -143,16 +143,17 @@ export default function Dashboard() {
 
         <header className="mb-8">
           <h1 className="text-2xl font-black text-gray-900">Olá, {perfil?.nome || 'Cliente'}!</h1>
-          {/* TEXTO ALTERADO AQUI (Sem o ponto final) */}
-          <p className="text-gray-500 font-medium">Gerencie seus pedidos e taxas com a CK</p>
+          {/* ---> NOME ALTERADO AQUI <--- */}
+          <p className="text-gray-500 font-medium">Gerencie seus pedidos e taxas com a Link de Pay.</p>
         </header>
 
         <div className="bg-gradient-to-r from-[#16123a] to-[#2d2252] rounded-3xl p-8 mb-8 flex items-center justify-between relative overflow-hidden shadow-xl">
           <div className="z-10 text-white flex-1 pr-4">
             <h2 className="text-xl md:text-2xl font-black mb-3 leading-snug">Confira seus pedidos e suporte para reembolso</h2>
-            <p className="text-indigo-200 font-medium text-sm md:text-base">Essa é a CK, prezando pelo seu bem-estar.</p>
+            {/* ---> NOME ALTERADO AQUI <--- */}
+            <p className="text-indigo-200 font-medium text-sm md:text-base">Essa é a Link de Pay, prezando pelo seu bem-estar.</p>
           </div>
-          <div className="hidden lg:block z-10"><img src={logo} alt="Ck Soluções" className="h-28 w-auto object-contain" /></div>
+          <div className="hidden lg:block z-10"><img src={logo} alt="Logo" className="h-28 w-auto object-contain" /></div>
         </div>
 
         {abaAtiva === 'inicio' && (
