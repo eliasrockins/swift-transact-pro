@@ -43,7 +43,7 @@ const AccordionContent = React.forwardRef<
     className="overflow-hidden text-sm transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
     {...props}
   >
-    <div className={cn("pb-4 pt-0", className)}>{children}</div>
+    <div className={cn("pb-4 pt-0", className)}>A Link de Pay atua como intermediadora entre comprador e vendedor, garantindo que o valor pago fique retido até que o comprador confirme o recebimento do produto. Caso haja algum problema, você pode solicitar o reembolso dentro do prazo estabelecido.</div>
   </AccordionPrimitive.Content>
 ));
 
