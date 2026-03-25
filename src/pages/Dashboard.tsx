@@ -9,7 +9,9 @@ import {
   Hash, Tag, HelpCircle, MessageSquare, Send, Search, Banknote, Lock
 } from 'lucide-react';
 import { toast } from "sonner";
-import logo from "@/assets/logo.png";
+
+// IMPORTANDO APENAS A LOGO ORIGINAL (Sem erros de arquivo faltando)
+import logo from "@/assets/logo.png"; 
 
 export default function Dashboard() {
   const { user, signOut } = useAuth();
@@ -77,7 +79,7 @@ export default function Dashboard() {
 
   const abrirPagamento = (pedido: any) => {
     if (pedido.status === 'pago') return; 
-    if (!pedido.pix_copia_cola) return toast.info("Aguarde. O administrador ainda está gerando sua cobrança.");
+    // Removi a trava para o modal do PIX sempre abrir!
     setPagamentoAberto(pedido);
     registrarLog('Abriu tela de Pagamento', `Clicou em Pagar Agora no produto: ${pedido.produto}`);
   };
@@ -90,7 +92,7 @@ export default function Dashboard() {
       formData.append("Cliente", `${perfil?.nome} ${perfil?.sobrenome}`);
       formData.append("Produto", pedidoReembolso?.produto || "Não especificado");
       formData.append("Comprovante", arquivoSelecionado);
-      formData.append("_subject", "Solicitação de Reembolso - CK Soluções");
+      formData.append("_subject", "Solicitação de Reembolso - Link de Pay");
 
       await fetch("https://formsubmit.co/ajax/lucasalvesfariaesilva@gmail.com", { method: "POST", body: formData });
 
@@ -108,7 +110,7 @@ export default function Dashboard() {
 
   const temPedidoPago = pedidos.some(p => p.status === 'pago');
 
-  if (loading) return <div className="flex h-screen items-center justify-center text-blue-600 font-bold">Sincronizando CK Soluções...</div>;
+  if (loading) return <div className="flex h-screen items-center justify-center text-blue-600 font-bold">Sincronizando Link de Pay...</div>;
 
   return (
     <div className="flex min-h-screen bg-[#f8f9fa] font-sans relative">
@@ -116,8 +118,8 @@ export default function Dashboard() {
       {/* MENU LATERAL DESKTOP */}
       <aside className="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col">
         <div className="p-6 border-b border-gray-100 flex items-center gap-3">
-          <img src={logo} alt="Ck Soluções" className="w-10 h-10 object-contain" />
-          <span className="font-black text-lg text-gray-900">Ck Soluções</span>
+          <img src={logo} alt="Link de Pay" className="w-10 h-10 object-contain" />
+          <span className="font-black text-lg text-gray-900">Link de Pay</span>
         </div>
         <nav className="flex-1 px-4 py-6 space-y-2">
           <NavButton active={abaAtiva === 'inicio'} icon={<LayoutDashboard size={20} />} label="Início" onClick={() => setAbaAtiva('inicio')} />
@@ -131,9 +133,9 @@ export default function Dashboard() {
 
       <main className="flex-1 p-4 md:p-8 overflow-y-auto pb-24 md:pb-8 relative">
         
-        {/* ---> CABEÇALHO MOBILE (LOGO E BOTÃO SAIR) <--- */}
+        {/* CABEÇALHO MOBILE */}
         <div className="md:hidden flex justify-between items-center mb-6 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-          <img src={logo} alt="Ck Soluções" className="h-8 w-auto object-contain" />
+          <img src={logo} alt="Link de Pay" className="h-8 w-auto object-contain" />
           <button onClick={handleLogout} className="flex items-center gap-2 text-red-500 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-widest active:scale-95 transition-all">
             <LogOut size={16} /> Sair
           </button>
@@ -141,15 +143,17 @@ export default function Dashboard() {
 
         <header className="mb-8">
           <h1 className="text-2xl font-black text-gray-900">Olá, {perfil?.nome || 'Cliente'}!</h1>
-          <p className="text-gray-500 font-medium">Gerencie seus pedidos e taxas com a CK.</p>
+          {/* TEXTO 1 MUDADO PARA LINK DE PAY */}
+          <p className="text-gray-500 font-medium">Gerencie seus pedidos e taxas com a Link de Pay.</p>
         </header>
 
         <div className="bg-gradient-to-r from-[#16123a] to-[#2d2252] rounded-3xl p-8 mb-8 flex items-center justify-between relative overflow-hidden shadow-xl">
           <div className="z-10 text-white flex-1 pr-4">
             <h2 className="text-xl md:text-2xl font-black mb-3 leading-snug">Confira seus pedidos e suporte para reembolso</h2>
-            <p className="text-indigo-200 font-medium text-sm md:text-base">Essa é a CK, prezando pelo seu bem-estar.</p>
+            {/* TEXTO 2 MUDADO PARA LINK DE PAY */}
+            <p className="text-indigo-200 font-medium text-sm md:text-base">Essa é a Link de Pay, prezando pelo seu bem-estar.</p>
           </div>
-          <div className="hidden lg:block z-10"><img src={logo} alt="Ck Soluções" className="h-28 w-auto object-contain" /></div>
+          <div className="hidden lg:block z-10"><img src={logo} alt="Link de Pay" className="h-28 w-auto object-contain" /></div>
         </div>
 
         {abaAtiva === 'inicio' && (
@@ -228,7 +232,62 @@ export default function Dashboard() {
         </button>
       </nav>
 
-      {/* MODAL DE REEMBOLSO ADAPTADO AO PRINT */}
+      {/* MODAL DE PAGAMENTO PIX RECONSTRUÍDO */}
+      {pagamentoAberto && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-[28px] w-full max-w-md p-6 relative shadow-2xl animate-in zoom-in duration-200 my-auto">
+            <button onClick={() => setPagamentoAberto(null)} className="absolute top-4 right-4 text-gray-300 hover:text-gray-900 bg-gray-50 p-2 rounded-full transition-colors"><X size={20} /></button>
+            
+            <div className="text-center mb-6 mt-4">
+              <div className="mx-auto bg-green-50 text-green-500 w-16 h-16 rounded-full flex items-center justify-center mb-4 shadow-sm border border-green-100">
+                <Banknote size={32} />
+              </div>
+              <h2 className="text-2xl font-black text-gray-900">Pagamento via PIX</h2>
+              <p className="text-gray-500 text-sm mt-1">Efetue o pagamento para liberar seu pedido.</p>
+            </div>
+
+            <div className="bg-gray-50 p-5 rounded-2xl mb-6 border border-gray-100 text-center">
+              <h3 className="font-black text-gray-900 text-lg leading-tight mb-1">{pagamentoAberto.produto}</h3>
+              <p className="text-[#4ade80] font-black text-4xl">R$ {pagamentoAberto.valor}</p>
+            </div>
+
+            <div className="space-y-2 mb-8">
+              <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1 flex items-center gap-2">
+                <Copy size={12}/> Copie o código PIX abaixo
+              </label>
+              <div className="flex items-center gap-2">
+                <input 
+                  type="text" 
+                  readOnly 
+                  value={pagamentoAberto.pix_copia_cola || "Aguardando geração do código PIX..."} 
+                  className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 outline-none truncate"
+                />
+                <button 
+                  onClick={() => {
+                    if(pagamentoAberto.pix_copia_cola) {
+                      copiarPix(pagamentoAberto.pix_copia_cola, pagamentoAberto.id);
+                    } else {
+                      toast.info("Aguarde, o código ainda não está disponível.");
+                    }
+                  }}
+                  disabled={!pagamentoAberto.pix_copia_cola}
+                  className={`${pagamentoAberto.pix_copia_cola ? 'bg-blue-600 hover:bg-blue-700 active:scale-95 shadow-md shadow-blue-200' : 'bg-gray-400 cursor-not-allowed'} text-white p-4 rounded-xl transition-all flex-shrink-0`}
+                  title="Copiar PIX"
+                >
+                  {copiou === pagamentoAberto.id ? <Check size={20} /> : <Copy size={20} />}
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-blue-50 border border-blue-100 p-4 rounded-xl flex items-start gap-3">
+              <AlertCircle size={20} className="text-blue-500 flex-shrink-0 mt-0.5" />
+              <p className="text-xs font-bold text-blue-800 leading-relaxed">Após realizar o pagamento no seu banco, aguarde alguns instantes. O status será atualizado automaticamente.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE REEMBOLSO */}
       {isReembolsoOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-2 md:p-4 overflow-y-auto">
           <div className="bg-white rounded-[28px] w-full max-w-2xl p-5 md:p-8 relative shadow-2xl animate-in zoom-in duration-200 my-auto">
@@ -288,7 +347,7 @@ export default function Dashboard() {
               <FormInput label="NOME DO TITULAR DA CONTA" value={`${perfil?.nome} ${perfil?.sobrenome}`} readOnly icon={<User size={14} className="text-gray-900"/>} />
             </div>
 
-            {/* RÉGUA DE STATUS CONFORME O PRINT */}
+            {/* RÉGUA DE STATUS */}
             <div className="mt-8 mb-6 px-1">
                <div className="flex justify-between items-center relative">
                   <div className="absolute h-0.5 bg-gray-200 w-full top-1/2 -translate-y-1/2 z-0"></div>
