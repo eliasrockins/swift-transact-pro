@@ -23,7 +23,7 @@ const Auth = () => {
         <div className="flex flex-col items-center justify-center mb-8 text-center">
           <img 
             src={logo} 
-            alt="Link de Pay" 
+            alt="Ck Soluções" 
             className="w-20 h-20 mb-5 drop-shadow-md object-contain" 
           />
           <h1 className="text-2xl font-black text-white tracking-tight">

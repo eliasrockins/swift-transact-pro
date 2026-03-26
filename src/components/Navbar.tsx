@@ -27,9 +27,9 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-border/50">
       <div className="container mx-auto px-6 py-4 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <img src={logo} alt="Link de Pay" className="w-10 h-10" />
+          <img src={logo} alt="Ck Soluções" className="w-10 h-10" />
           <span className="font-heading font-bold text-xl text-white">
-            Link de Pay
+            Ck Soluções
           </span>
         </Link>
 

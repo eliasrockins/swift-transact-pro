@@ -8,7 +8,7 @@ import {
 
 const faqItems = [
   {
-    question: "Como funciona ? Como comprar utilizando a Link de Pay ?",
+    question: "Como funciona ? Como comprar utilizando a Ck Soluções ?",
     answer:
       'Funciona da seguinte forma, você irá se cadastrar em nosso site e informar os seguintes dados (Nome Completo, CPF, Endereço de entrega com CEP e E-mail ) + Código da Cobrança (Que deverá ser informado pelo seu vendedor(a), O vendedor(a) lançará uma cobrança em nossa plataforma, ao fazer login em "Minha Conta" e na aba "Pedidos" você encontrará seu Produto, basta clicar em "Pagar", o pagamento o valor fica retido ao vendedor(a) até você cliente confirmar para nós o recebimento do produto comprado, após a confirmação o valor será desbloqueado ao vendedor(a), e você terá até 14 dias para poder averiguar o produto e entrar com pedido de reembolso.',
   },
@@ -20,7 +20,7 @@ const faqItems = [
   {
     question: "Como posso ter certeza que estou comprando de maneira segura ?",
     answer:
-      "A Link de Pay atua como intermediadora entre comprador e vendedor, garantindo que o valor pago fique retido até que o comprador confirme o recebimento do produto. Caso haja algum problema, você pode solicitar o reembolso dentro do prazo estabelecido.",
+      "A Ck Soluções atua como intermediadora entre comprador e vendedor, garantindo que o valor pago fique retido até que o comprador confirme o recebimento do produto. Caso haja algum problema, você pode solicitar o reembolso dentro do prazo estabelecido.",
   },
   {
     question: "É possível pagar com cartão de crédito?",

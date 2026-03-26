@@ -32,8 +32,8 @@ const HeroSection = () => {
             transition={{ duration: 0.5 }}
             className="flex items-center gap-3 mb-8"
           >
-            <img src={logo} alt="Link de Pay" className="w-16 h-16" />
-            <span className="text-2xl font-heading font-bold text-primary">Link de Pay</span>
+            <img src={logo} alt="Ck Soluções" className="w-16 h-16" />
+            <span className="text-2xl font-heading font-bold text-primary">Ck Soluções</span>
           </motion.div>
 
           <motion.h1
@@ -42,7 +42,7 @@ const HeroSection = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
               className="text-5xl md:text-7xl font-heading font-bold leading-tight mb-6"
             >
-              Link de Pay inteligentes{" "}
+              Ck Soluções inteligentes{" "}
             <span className="text-gradient">para o seu negócio</span>
           </motion.h1>
 

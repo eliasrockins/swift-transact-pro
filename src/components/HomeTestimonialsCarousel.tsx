@@ -10,19 +10,19 @@ const testimonials = [
     name: "Lucas A. Marini",
     role: "Advogado",
     image: testimonialLucas,
-    text: "Minha experiência com a Link de Pay foi excepcional. Fiquei surpreso com a agilidade na entrega do meu pedido e com a qualidade do produto recebido. Além disso, o sistema de pagamento seguro me proporcionou tranquilidade durante toda a transação. Sem dúvida, continuarei utilizando a Link de Pay para minhas compras online e recomendo a todos que buscam praticidade e segurança",
+    text: "Minha experiência com a Ck Soluções foi excepcional. Fiquei surpreso com a agilidade na entrega do meu pedido e com a qualidade do produto recebido. Além disso, o sistema de pagamento seguro me proporcionou tranquilidade durante toda a transação. Sem dúvida, continuarei utilizando a Ck Soluções para minhas compras online e recomendo a todos que buscam praticidade e segurança",
   },
   {
     name: "Ana Ruas",
     role: "Professora",
     image: testimonialAna,
-    text: "Estou extremamente satisfeita com a minha experiência ao usar a Link de Pay. Fiquei impressionada com a rapidez com que recebi meu produto após a compra. Além disso, fiquei tranquila sabendo que o pagamento estava protegido durante todo o processo. Recomendo a Link de Pay a todos os que procuram uma plataforma confiável e eficiente para suas compras online",
+    text: "Estou extremamente satisfeita com a minha experiência ao usar a Ck Soluções. Fiquei impressionada com a rapidez com que recebi meu produto após a compra. Além disso, fiquei tranquila sabendo que o pagamento estava protegido durante todo o processo. Recomendo a Ck Soluções a todos os que procuram uma plataforma confiável e eficiente para suas compras online",
   },
   {
     name: "Suzana Bertolaccini",
     role: "Administradora",
     image: testimonialSuzana,
-    text: "Estou encantada com a minha experiência na Link de Pay. A rapidez com que recebi meu pedido me surpreendeu positivamente, e a qualidade do produto superou minhas expectativas. Além disso, a segurança no processo de pagamento me deixou muito tranquila. Recomendo a Link de Pay para todas as mulheres que buscam praticidade e confiança ao fazerem suas compras online",
+    text: "Estou encantada com a minha experiência na Ck Soluções. A rapidez com que recebi meu pedido me surpreendeu positivamente, e a qualidade do produto superou minhas expectativas. Além disso, a segurança no processo de pagamento me deixou muito tranquila. Recomendo a Ck Soluções para todas as mulheres que buscam praticidade e confiança ao fazerem suas compras online",
   },
 ];
 
