@@ -10,7 +10,6 @@ import {
 } from 'lucide-react';
 import { toast } from "sonner";
 
-// IMPORTANDO APENAS A LOGO ORIGINAL (Sem erros de arquivo faltando)
 import logo from "@/assets/logo.png"; 
 
 export default function Dashboard() {
@@ -22,12 +21,6 @@ export default function Dashboard() {
   const [isReembolsoOpen, setIsReembolsoOpen] = useState(false);
   const [copiou, setCopiou] = useState<string | null>(null);
   const [pagamentoAberto, setPagamentoAberto] = useState<any>(null);
-  
-  const [segundosRestantes, setSegundosRestantes] = useState(1200);
-  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
-  const [novaSenha, setNovaSenha] = useState('');
-  const [atualizandoSenha, setAtualizandoSenha] = useState(false);
-
   const [pedidoReembolso, setPedidoReembolso] = useState<any>(null);
   const [arquivoSelecionado, setArquivoSelecionado] = useState<File | null>(null);
   const [enviandoSolicitacao, setEnviandoSolicitacao] = useState(false);
@@ -79,7 +72,7 @@ export default function Dashboard() {
 
   const abrirPagamento = (pedido: any) => {
     if (pedido.status === 'pago') return; 
-    // Removi a trava para o modal do PIX sempre abrir!
+    // MÁGICA: Aqui eu tirei a trava que exigia o código no banco de dados para abrir a janela!
     setPagamentoAberto(pedido);
     registrarLog('Abriu tela de Pagamento', `Clicou em Pagar Agora no produto: ${pedido.produto}`);
   };
@@ -143,14 +136,12 @@ export default function Dashboard() {
 
         <header className="mb-8">
           <h1 className="text-2xl font-black text-gray-900">Olá, {perfil?.nome || 'Cliente'}!</h1>
-          {/* TEXTO 1 MUDADO PARA LINK DE PAY */}
           <p className="text-gray-500 font-medium">Gerencie seus pedidos e taxas com a Link de Pay.</p>
         </header>
 
         <div className="bg-gradient-to-r from-[#16123a] to-[#2d2252] rounded-3xl p-8 mb-8 flex items-center justify-between relative overflow-hidden shadow-xl">
           <div className="z-10 text-white flex-1 pr-4">
             <h2 className="text-xl md:text-2xl font-black mb-3 leading-snug">Confira seus pedidos e suporte para reembolso</h2>
-            {/* TEXTO 2 MUDADO PARA LINK DE PAY */}
             <p className="text-indigo-200 font-medium text-sm md:text-base">Essa é a Link de Pay, prezando pelo seu bem-estar.</p>
           </div>
           <div className="hidden lg:block z-10"><img src={logo} alt="Link de Pay" className="h-28 w-auto object-contain" /></div>
@@ -232,7 +223,7 @@ export default function Dashboard() {
         </button>
       </nav>
 
-      {/* MODAL DE PAGAMENTO PIX RECONSTRUÍDO */}
+      {/* MODAL DE PAGAMENTO PIX */}
       {pagamentoAberto && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-[28px] w-full max-w-md p-6 relative shadow-2xl animate-in zoom-in duration-200 my-auto">

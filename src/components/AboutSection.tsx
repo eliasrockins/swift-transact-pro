@@ -47,17 +47,17 @@ const testimonials = [
   {
     name: "Lucas A. Marini",
     role: "Advogado",
-    text: "Minha experiência com a CK Soluções foi excepcional. Fiquei surpreso com a agilidade na entrega do meu pedido e com a qualidade do produto recebido. Além disso, o sistema de pagamento seguro me proporcionou tranquilidade durante toda a transação.",
+    text: "Minha experiência com a Link de Pay foi excepcional. Fiquei surpreso com a agilidade na entrega do meu pedido e com a qualidade do produto recebido. Além disso, o sistema de pagamento seguro me proporcionou tranquilidade durante toda a transação.",
   },
   {
     name: "Ana Ruas",
     role: "Professora",
-    text: "Estou extremamente satisfeita com a minha experiência ao usar a CK Soluções. Fiquei impressionada com a rapidez com que recebi meu produto após a compra. Além disso, fiquei tranquila sabendo que o pagamento estava protegido durante todo o processo.",
+    text: "Estou extremamente satisfeita com a minha experiência ao usar a Link de Pay. Fiquei impressionada com a rapidez com que recebi meu produto após a compra. Além disso, fiquei tranquila sabendo que o pagamento estava protegido durante todo o processo.",
   },
   {
     name: "Suzana Bertolaccini",
     role: "Administradora",
-    text: "Estou encantada com a minha experiência na CK Soluções. A rapidez com que recebi meu pedido me surpreendeu positivamente, e a qualidade do produto superou minhas expectativas. A segurança no processo de pagamento me deixou muito tranquila.",
+    text: "Estou encantada com a minha experiência na Link de Pay. A rapidez com que recebi meu pedido me surpreendeu positivamente, e a qualidade do produto superou minhas expectativas. A segurança no processo de pagamento me deixou muito tranquila.",
   },
 ];
 
@@ -97,7 +97,7 @@ const AboutSection = () => {
             <div className="relative rounded-2xl overflow-hidden" style={{ borderLeft: '4px solid hsl(var(--primary))' }}>
                 <img
                   src={aboutImage}
-                  alt="Equipe CK Soluções"
+                  alt="Equipe Link de Pay"
                   className="w-full aspect-[4/3] object-cover"
                 />
               </div>
@@ -116,7 +116,7 @@ const AboutSection = () => {
                 <span className="text-gradient">clientes</span>
               </h2>
               <p className="text-muted-foreground text-lg leading-relaxed mb-8">
-                A equipe por trás do site CK Soluções é composta por profissionais altamente qualificados e dedicados, que trabalham em conjunto para garantir a melhor experiência possível para nossos usuários.
+                A equipe por trás do site Link de Pay é composta por profissionais altamente qualificados e dedicados, que trabalham em conjunto para garantir a melhor experiência possível para nossos usuários.
               </p>
 
               <div className="grid grid-cols-2 gap-4 mb-8">

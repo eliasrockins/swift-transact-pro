@@ -8,7 +8,7 @@ import {
 
 const faqs = [
   {
-    question: "Como funciona? Como comprar utilizando a CK Soluções?",
+    question: "Como funciona? Como comprar utilizando a Link de Pay?",
     answer:
       "Você irá se cadastrar em nosso site e informar seus dados (Nome Completo, CPF, Endereço de entrega com CEP e E-mail) + Código da Cobrança informado pelo vendedor. O valor fica retido até você confirmar o recebimento do produto. Após a confirmação, o valor é liberado ao vendedor. Você tem até 14 dias para averiguar o produto e solicitar reembolso.",
   },

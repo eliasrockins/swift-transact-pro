@@ -23,7 +23,7 @@ const WhatsAppPopup = () => {
                   <MessageCircle className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <p className="text-white font-heading font-semibold text-sm">CK Soluções</p>
+                  <p className="text-white font-heading font-semibold text-sm">Link de Pay</p>
                   <p className="text-white/80 text-xs">Online agora</p>
                 </div>
               </div>
