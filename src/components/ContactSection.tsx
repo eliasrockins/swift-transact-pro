@@ -41,7 +41,7 @@ const ContactSection = () => {
             {[
               { icon: MessageCircle, label: "WhatsApp", value: "11 92151 9195", href: "https://api.whatsapp.com/send?phone=5511921519195" },
               { icon: Phone, label: "Telefone", value: "11 92151 9195", href: "tel:+5511921519195" },
-              { icon: Mail, label: "Email", value: "contato@cksolucoes.com", href: "mailto:contato@cksolucoes.com" },
+              { icon: Mail, label: "Email", value: "contato@linkdepay.com", href: "mailto:contato@linkdepay.com" },
             ].map((item) => (
               <a
                 key={item.label}
