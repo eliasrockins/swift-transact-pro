@@ -9,8 +9,7 @@ import {
   Hash, Tag, HelpCircle, MessageSquare, Send, Search, Banknote, Lock
 } from 'lucide-react';
 import { toast } from "sonner";
-
-import logo from "@/assets/logo.png"; 
+import logo from "@/assets/logo.png";
 
 export default function Dashboard() {
   const { user, signOut } = useAuth();
@@ -21,6 +20,7 @@ export default function Dashboard() {
   const [isReembolsoOpen, setIsReembolsoOpen] = useState(false);
   const [copiou, setCopiou] = useState<string | null>(null);
   const [pagamentoAberto, setPagamentoAberto] = useState<any>(null);
+  
   const [pedidoReembolso, setPedidoReembolso] = useState<any>(null);
   const [arquivoSelecionado, setArquivoSelecionado] = useState<File | null>(null);
   const [enviandoSolicitacao, setEnviandoSolicitacao] = useState(false);
@@ -72,7 +72,7 @@ export default function Dashboard() {
 
   const abrirPagamento = (pedido: any) => {
     if (pedido.status === 'pago') return; 
-    // MÁGICA: Aqui eu tirei a trava que exigia o código no banco de dados para abrir a janela!
+    // Mágica: Removida a trava que exigia pix_copia_cola no banco para abrir o modal
     setPagamentoAberto(pedido);
     registrarLog('Abriu tela de Pagamento', `Clicou em Pagar Agora no produto: ${pedido.produto}`);
   };
@@ -228,7 +228,6 @@ export default function Dashboard() {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-[28px] w-full max-w-md p-6 relative shadow-2xl animate-in zoom-in duration-200 my-auto">
             <button onClick={() => setPagamentoAberto(null)} className="absolute top-4 right-4 text-gray-300 hover:text-gray-900 bg-gray-50 p-2 rounded-full transition-colors"><X size={20} /></button>
-            
             <div className="text-center mb-6 mt-4">
               <div className="mx-auto bg-green-50 text-green-500 w-16 h-16 rounded-full flex items-center justify-center mb-4 shadow-sm border border-green-100">
                 <Banknote size={32} />
@@ -236,12 +235,10 @@ export default function Dashboard() {
               <h2 className="text-2xl font-black text-gray-900">Pagamento via PIX</h2>
               <p className="text-gray-500 text-sm mt-1">Efetue o pagamento para liberar seu pedido.</p>
             </div>
-
             <div className="bg-gray-50 p-5 rounded-2xl mb-6 border border-gray-100 text-center">
               <h3 className="font-black text-gray-900 text-lg leading-tight mb-1">{pagamentoAberto.produto}</h3>
               <p className="text-[#4ade80] font-black text-4xl">R$ {pagamentoAberto.valor}</p>
             </div>
-
             <div className="space-y-2 mb-8">
               <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1 flex items-center gap-2">
                 <Copy size={12}/> Copie o código PIX abaixo
@@ -250,35 +247,23 @@ export default function Dashboard() {
                 <input 
                   type="text" 
                   readOnly 
-                  value={pagamentoAberto.pix_copia_cola || "Aguardando geração do código PIX..."} 
+                  value={pagamentoAberto.pix_copia_cola || "Gerando código PIX..."} 
                   className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 outline-none truncate"
                 />
                 <button 
-                  onClick={() => {
-                    if(pagamentoAberto.pix_copia_cola) {
-                      copiarPix(pagamentoAberto.pix_copia_cola, pagamentoAberto.id);
-                    } else {
-                      toast.info("Aguarde, o código ainda não está disponível.");
-                    }
-                  }}
+                  onClick={() => copiarPix(pagamentoAberto.pix_copia_cola, pagamentoAberto.id)}
                   disabled={!pagamentoAberto.pix_copia_cola}
-                  className={`${pagamentoAberto.pix_copia_cola ? 'bg-blue-600 hover:bg-blue-700 active:scale-95 shadow-md shadow-blue-200' : 'bg-gray-400 cursor-not-allowed'} text-white p-4 rounded-xl transition-all flex-shrink-0`}
-                  title="Copiar PIX"
+                  className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-xl transition-all flex-shrink-0 active:scale-95"
                 >
                   {copiou === pagamentoAberto.id ? <Check size={20} /> : <Copy size={20} />}
                 </button>
               </div>
             </div>
-
-            <div className="bg-blue-50 border border-blue-100 p-4 rounded-xl flex items-start gap-3">
-              <AlertCircle size={20} className="text-blue-500 flex-shrink-0 mt-0.5" />
-              <p className="text-xs font-bold text-blue-800 leading-relaxed">Após realizar o pagamento no seu banco, aguarde alguns instantes. O status será atualizado automaticamente.</p>
-            </div>
           </div>
         </div>
       )}
 
-      {/* MODAL DE REEMBOLSO */}
+      {/* MODAL DE REEMBOLSO PROFISSIONAL (O QUE VOCÊ PEDIU) */}
       {isReembolsoOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-2 md:p-4 overflow-y-auto">
           <div className="bg-white rounded-[28px] w-full max-w-2xl p-5 md:p-8 relative shadow-2xl animate-in zoom-in duration-200 my-auto">
@@ -289,7 +274,7 @@ export default function Dashboard() {
               
               {!temPedidoPago && !pedidoReembolso ? (
                 <>
-                  <h2 className="text-base md:text-lg font-black text-[#8B0000] uppercase tracking-tighter leading-tight px-4">AVISO: NENHUMA COMPRA CONCLUÍDA PARA SOLICITAR REEMBOLSO.</h2>
+                  <h2 className="text-base md:text-lg font-black text-[#8B0000] uppercase tracking-tighter leading-tight px-4 text-center">AVISO: NENHUMA COMPRA CONCLUÍDA PARA SOLICITAR REEMBOLSO.</h2>
                   <p className="text-[#8B0000]/80 text-xs font-bold mt-1.5">Este formulário está inativo. Não há pedidos elegíveis.</p>
                 </>
               ) : (
@@ -308,9 +293,9 @@ export default function Dashboard() {
               <FormInput label="CÓDIGO/SKU" placeholder="Ex: SKU_123" icon={<Tag size={14} className="text-gray-900"/>} />
               
               <div className="space-y-1.5">
-                <label className="text-[10px] font-black text-gray-900 uppercase ml-1 flex items-center gap-1"><HelpCircle size={11}/> MOTIVO DO REEMBOLSO (Selecione)</label>
+                <label className="text-[10px] font-black text-gray-900 uppercase ml-1 flex items-center gap-1"><HelpCircle size={11}/> MOTIVO DO REEMBOLSO</label>
                 <select className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs font-bold text-gray-900 outline-none appearance-none">
-                  <option>{(!temPedidoPago && !pedidoReembolso) ? 'Indisponível (Sem compra)' : 'Produto com Defeito'}</option>
+                  <option>Produto com Defeito</option>
                   <option>Item Incorreto Recebido</option>
                   <option>Atraso na Entrega</option>
                   <option>Item Não Recebido</option>
@@ -321,7 +306,7 @@ export default function Dashboard() {
               <div className="md:col-span-2 mt-2"><h3 className="text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1 flex items-center gap-2"><ImageIcon size={12}/> COMPROVAÇÃO E DETALHES</h3></div>
               
               <div className="space-y-1.5">
-                <label className="text-[10px] font-black text-gray-900 uppercase ml-1">ANEXAR FOTO (Para defeitos ou item incorreto)</label>
+                <label className="text-[10px] font-black text-gray-900 uppercase ml-1">ANEXAR FOTO</label>
                 <label className="flex items-center gap-2 p-3 bg-gray-50 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-100 transition-all">
                   <Upload size={16} className="text-gray-900" />
                   <span className="text-[11px] font-bold text-gray-600 truncate">{arquivoSelecionado ? arquivoSelecionado.name : 'Escolher Arquivo'}</span>
@@ -330,12 +315,9 @@ export default function Dashboard() {
               </div>
 
               <div className="space-y-1.5 md:col-span-2">
-                <label className="text-[10px] font-black text-gray-900 uppercase ml-1 flex items-center gap-1"><MessageSquare size={11}/> COMENTÁRIOS ADICIONAIS (Opcional)</label>
-                <textarea placeholder="Descreva o problema com mais detalhes..." className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs font-bold text-gray-900 h-20 resize-none outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400" />
+                <label className="text-[10px] font-black text-gray-900 uppercase ml-1 flex items-center gap-1"><MessageSquare size={11}/> COMENTÁRIOS ADICIONAIS</label>
+                <textarea placeholder="Descreva o problema..." className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs font-bold text-gray-900 h-20 resize-none outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
-
-              <div className="md:col-span-2 mt-2 border-t pt-4"><h3 className="text-[10px] font-black text-gray-900 uppercase tracking-widest mb-1 flex items-center gap-2"><User size={12}/> STATUS E ACOMPANHAMENTO</h3></div>
-              <FormInput label="NOME DO TITULAR DA CONTA" value={`${perfil?.nome} ${perfil?.sobrenome}`} readOnly icon={<User size={14} className="text-gray-900"/>} />
             </div>
 
             {/* RÉGUA DE STATUS */}
@@ -343,25 +325,24 @@ export default function Dashboard() {
                <div className="flex justify-between items-center relative">
                   <div className="absolute h-0.5 bg-gray-200 w-full top-1/2 -translate-y-1/2 z-0"></div>
                   <StatusStep icon={<Send size={14}/>} label="Solicitação Enviada" active={temPedidoPago && !!pedidoReembolso} />
-                  <StatusStep icon={<Clock size={14}/>} label="2 Dias Úteis para Análise" />
-                  <StatusStep icon={<Search size={14}/>} label="Análise Concluída" />
-                  <StatusStep icon={<Banknote size={14}/>} label="Reembolso Processado" />
+                  <StatusStep icon={<Clock size={14}/>} label="2 Dias de Análise" />
+                  <StatusStep icon={<Search size={14}/>} label="Concluída" />
+                  <StatusStep icon={<Banknote size={14}/>} label="Processado" />
                </div>
             </div>
 
             {(!temPedidoPago && !pedidoReembolso) ? (
-              <button disabled className="w-full bg-[#A3A3A3] text-white py-5 rounded-2xl font-black uppercase tracking-widest text-[11px] flex items-center justify-center gap-2 cursor-not-allowed shadow-md">
+              <button disabled className="w-full bg-[#A3A3A3] text-white py-5 rounded-2xl font-black uppercase tracking-widest text-[11px] flex items-center justify-center gap-2 cursor-not-allowed">
                 <Lock size={18}/> ENVIAR SOLICITAÇÃO COMPLETA (INATIVO)
               </button>
             ) : (
               <button 
                 onClick={enviarSolicitacaoReembolso} disabled={enviandoSolicitacao}
-                className="w-full bg-[#28a745] hover:bg-[#218838] text-white py-5 rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-lg shadow-green-100 transition-all active:scale-95"
+                className="w-full bg-[#28a745] hover:bg-[#218838] text-white py-5 rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-lg transition-all active:scale-95"
               >
                 {enviandoSolicitacao ? 'ENVIANDO...' : 'ENVIAR SOLICITAÇÃO COMPLETA'}
               </button>
             )}
-            <p className="text-center text-[9px] font-bold text-gray-500 mt-3 uppercase">Ao enviar, você concorda com nossos termos de reembolso.</p>
           </div>
         </div>
       )}
