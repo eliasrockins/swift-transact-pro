@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 
 const videoSlots = [
-  { id: 1, src: "/videos/depoimento-1.mov", type: "video/mp4", poster: "/images/depoimento-1-poster.png" },
+ ,
   { id: 2, src: "/videos/depoimento-2.mp4", type: "video/mp4", poster: "/images/depoimento-2-poster.png" },
   { id: 3, src: "/videos/depoimento-3.mp4", type: "video/mp4", poster: "/images/depoimento-3-poster.png" },
   { id: 4, src: "/videos/depoimento-4.mp4", type: "video/mp4", poster: "/images/depoimento-4-poster.png" },
