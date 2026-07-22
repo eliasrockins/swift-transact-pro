@@ -1,7 +1,7 @@
 import Navbar from "@/components/Navbar";
 import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
-import WhatsAppPopup from "@/components/WhatsAppPopup";
+
 
 const FAQ = () => {
   return (
@@ -11,7 +11,7 @@ const FAQ = () => {
         <FAQSection />
       </div>
       <Footer />
-      <WhatsAppPopup />
+      
     </div>
   );
 };

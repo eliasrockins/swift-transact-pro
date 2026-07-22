@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import WhatsAppPopup from "@/components/WhatsAppPopup";
+
 
 const plans = [
   {
@@ -114,7 +114,7 @@ const Assinaturas = () => {
         </div>
       </div>
       <Footer />
-      <WhatsAppPopup />
+      
     </div>
   );
 };

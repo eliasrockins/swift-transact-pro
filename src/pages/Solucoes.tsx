@@ -4,7 +4,7 @@ import WhoWeAreSection from "@/components/WhoWeAreSection";
 import ServicesGrid from "@/components/ServicesGrid";
 import ClientsCarousel from "@/components/ClientsCarousel";
 import Footer from "@/components/Footer";
-import WhatsAppPopup from "@/components/WhatsAppPopup";
+
 
 const Solucoes = () => {
   return (
@@ -17,7 +17,7 @@ const Solucoes = () => {
         <ClientsCarousel />
       </div>
       <Footer />
-      <WhatsAppPopup />
+      
     </div>
   );
 };
