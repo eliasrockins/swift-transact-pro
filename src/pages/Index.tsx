@@ -9,7 +9,7 @@ import CTASection from "@/components/CTASection";
 import HomeFAQSection from "@/components/HomeFAQSection";
 import HomeTestimonialsCarousel from "@/components/HomeTestimonialsCarousel";
 import Footer from "@/components/Footer";
-import WhatsAppPopup from "@/components/WhatsAppPopup";
+
 
 const Index = () => {
   return (
@@ -27,7 +27,7 @@ const Index = () => {
       <HomeTestimonialsCarousel />
       <CTASection />
       <Footer />
-      <WhatsAppPopup />
+      
     </div>
   );
 };

@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import WhatsAppPopup from "@/components/WhatsAppPopup";
+
 
 const bandeiras = [
   { id: "visa", label: "Visa" },
@@ -160,7 +160,7 @@ const Pagamento = () => {
         </div>
       </div>
       <Footer />
-      <WhatsAppPopup />
+      
     </div>
   );
 };

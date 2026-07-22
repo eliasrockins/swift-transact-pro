@@ -1,7 +1,7 @@
 import Navbar from "@/components/Navbar";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import Footer from "@/components/Footer";
-import WhatsAppPopup from "@/components/WhatsAppPopup";
+
 
 const Depoimentos = () => {
   return (
@@ -11,7 +11,7 @@ const Depoimentos = () => {
         <TestimonialsSection />
       </div>
       <Footer />
-      <WhatsAppPopup />
+      
     </div>
   );
 };
