@@ -17,16 +17,7 @@ const WhatsAppPopup = () => {
             className="mb-4 w-80 rounded-2xl bg-card border border-border shadow-2xl overflow-hidden"
           >
             {/* Header */}
-            <div className="bg-[#25D366] px-5 py-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                  <MessageCircle className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <p className="text-white font-heading font-semibold text-sm">Ck Soluções</p>
-                  <p className="text-white/80 text-xs">Online agora</p>
-                </div>
-              </div>
+            <div className="bg-[#25D366] px-5 py-4 flex items-center justify-end">
               <button onClick={() => setIsOpen(false)} className="text-white/80 hover:text-white transition-colors">
                 <X className="w-5 h-5" />
               </button>
