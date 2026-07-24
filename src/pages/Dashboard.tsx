@@ -72,7 +72,6 @@ export default function Dashboard() {
 
   const abrirPagamento = (pedido: any) => {
     if (pedido.status === 'pago') return; 
-    // Mágica: Removida a trava que exigia pix_copia_cola no banco para abrir o modal
     setPagamentoAberto(pedido);
     registrarLog('Abriu tela de Pagamento', `Clicou em Pagar Agora no produto: ${pedido.produto}`);
   };
@@ -81,8 +80,12 @@ export default function Dashboard() {
     if (!arquivoSelecionado) return toast.error("Anexe o comprovante.");
     setEnviandoSolicitacao(true);
     try {
+      const nomeCliente = perfil?.nome 
+        ? (perfil?.sobrenome ? `${perfil.nome} ${perfil.sobrenome}` : perfil.nome) 
+        : "Cliente";
+
       const formData = new FormData();
-      formData.append("Cliente", `${perfil?.nome} ${perfil?.sobrenome}`);
+      formData.append("Cliente", nomeCliente);
       formData.append("Produto", pedidoReembolso?.produto || "Não especificado");
       formData.append("Comprovante", arquivoSelecionado);
       formData.append("_subject", "Solicitação de Reembolso - Ck Soluções");
@@ -201,10 +204,25 @@ export default function Dashboard() {
           <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
             <h3 className="font-black text-gray-900 mb-8 border-b pb-4">Dados de Cadastro</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-               <DataRow label="Nome Completo" value={`${perfil?.nome} ${perfil?.sobrenome}`} />
+               <DataRow 
+                 label="Nome Completo" 
+                 value={perfil?.nome ? (perfil?.sobrenome ? `${perfil.nome} ${perfil.sobrenome}` : perfil.nome) : 'Não informado'} 
+               />
                <DataRow label="CPF" value={perfil?.cpf} />
                <DataRow label="Telefone" value={perfil?.telefone} />
                <DataRow label="Código de Cobrança" value={perfil?.codigo_cobranca} />
+
+               {/* SEÇÃO DE ENDEREÇO */}
+               <div className="md:col-span-2 mt-2">
+                 <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest border-t pt-4">Endereço de Entrega / Cobrança</h4>
+               </div>
+
+               <DataRow 
+                 label="Endereço Completo" 
+                 value={perfil?.endereco || (perfil?.rua ? `${perfil.rua}, ${perfil.numero || 'S/N'}${perfil.bairro ? ` - ${perfil.bairro}` : ''}` : null)} 
+               />
+               <DataRow label="CEP" value={perfil?.cep} />
+               <DataRow label="Cidade / UF" value={perfil?.cidade ? `${perfil.cidade}${perfil.estado ? ` - ${perfil.estado}` : ''}` : null} />
             </div>
           </div>
         )}
@@ -263,7 +281,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* MODAL DE REEMBOLSO PROFISSIONAL (O QUE VOCÊ PEDIU) */}
+      {/* MODAL DE REEMBOLSO */}
       {isReembolsoOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-2 md:p-4 overflow-y-auto">
           <div className="bg-white rounded-[28px] w-full max-w-2xl p-5 md:p-8 relative shadow-2xl animate-in zoom-in duration-200 my-auto">
